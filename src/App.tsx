@@ -60,13 +60,13 @@ export default function App() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <img src={asset('assets/covers-icon-orange.svg')} style={{ width: 30, height: 30 }} alt="" />
-            <h1 style={{ margin: 0, fontFamily: "'Founders Grotesk'", fontWeight: 700, fontSize: 25, color: '#fff', letterSpacing: '.4px' }}>Promo Template Builder</h1>
+            <h1 style={{ margin: 0, fontWeight: 700, fontSize: 25, color: '#fff', letterSpacing: '-.01em' }}>Promo Template Builder</h1>
           </div>
           <div style={{ fontSize: 13, color: '#6b7682', marginTop: 7, maxWidth: 680 }}>
             Three ad templates from one set of edits. Pick a brand, swap the ball graphics, edit the copy and fine-tune each graphic. Every change updates live. Export the selected graphics as WebP in one zip.
           </div>
         </div>
-        <div className="mono" style={{ fontSize: 11, color: '#4c5763', letterSpacing: '.04em' }}>COVERS &nbsp;×&nbsp; {catName.toUpperCase()} PROMO</div>
+        <div style={{ fontSize: 11, color: '#4c5763', letterSpacing: '.04em' }}>COVERS &nbsp;×&nbsp; {catName.toUpperCase()} PROMO</div>
       </header>
 
       <nav style={{ display: 'flex', gap: 8, padding: '0 30px 10px', flexWrap: 'wrap' }} aria-label="Category">
@@ -103,7 +103,7 @@ export default function App() {
           <section key={key} className="card" aria-label={title}>
             <div style={{ padding: '15px 16px', borderBottom: '1px solid #1b2530' }}>
               <div style={{ fontWeight: 700, fontSize: 14, color: '#e8edf2' }}>{title}</div>
-              <div className="mono" style={{ fontSize: 11, color: '#5f6b78', marginTop: 2 }}>{size}</div>
+              <div style={{ fontSize: 11, color: '#5f6b78', marginTop: 2 }}>{size}</div>
             </div>
             <div style={{ padding: 16, background: '#06080a', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: key === 't1' ? undefined : 269 }}>
               <div style={{ width: preview.w, height: preview.h, overflow: 'hidden', borderRadius: 8, position: 'relative', boxShadow: '0 6px 24px rgba(0,0,0,.5)' }}>

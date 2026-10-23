@@ -56,9 +56,10 @@ const GEO: Record<TemplateKey, FormatGeo> = {
 };
 
 const WAVE_MASK = 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%)';
+// Licensing: Founders Grotesk Bold is only for the offer text and the promo code; everything else is Inter.
 const FG = "'Founders Grotesk'";
-const FONO = "'Aeonik Fono', monospace";
-const MONO = "700 26px 'IBM Plex Mono', monospace";
+const INTER = "'Inter', sans-serif";
+const DEBUG_FONT = "700 26px 'Inter', sans-serif";
 
 function Ball({ geo, url, size, transform }: { geo: BallGeo; url: string; size: string; transform: string }) {
   return (
@@ -122,13 +123,13 @@ function CodeZone({ v, g }: { v: View; g: FormatGeo }) {
   return (
     <div data-zone="code" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center' }}>
       <div data-unit="1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transformOrigin: 'center' }}>
-        <div style={{ fontFamily: FONO, fontSize: g.labelSize, color: v.promoLabelC, letterSpacing: '.14em', marginTop: v.lblMT, fontWeight: 400, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{v.promoLabel}</div>
+        <div style={{ fontFamily: INTER, fontSize: g.labelSize, color: v.promoLabelC, letterSpacing: '.14em', marginTop: v.lblMT, fontWeight: 400, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{v.promoLabel}</div>
         <div data-pill="1" data-ring={v.pillRing} style={{
           marginTop: v.pillMT, width: 'fit-content', maxWidth: v.pillMaxW, overflow: 'hidden', padding: '26px 64px', background: v.pillBg, borderRadius: 999,
           display: 'flex', alignItems: 'center', justifyContent: 'center', border: `8px solid ${v.pillBorder}`,
           boxShadow: `0 0 0 14px ${v.pillRing},0 18px 50px rgba(0,0,0,.45)`,
         }}>
-          <span data-code="1" style={{ fontFamily: FONO, fontWeight: 900, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, transform: 'none' }}>{v.code}</span>
+          <span data-code="1" style={{ fontFamily: FG, fontWeight: 700, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, position: 'relative', top: '0.185em', transform: 'none' }}>{v.code}</span>
         </div>
       </div>
     </div>
@@ -139,7 +140,7 @@ function TcsZone({ v }: { v: View }) {
   return (
     <div data-zone="tcs" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div data-role="tcs" style={{
-        fontFamily: "'Inter', sans-serif", fontSize: v.tcsFS, lineHeight: 1.25, color: v.text, opacity: 0.62, marginTop: v.tcsMT,
+        fontFamily: INTER, fontSize: v.tcsFS, lineHeight: 1.25, color: v.text, opacity: 0.62, marginTop: v.tcsMT,
         width: v.tcsW, height: 'auto', overflow: 'visible', textAlign: 'center',
       }}>{v.tcs}</div>
     </div>
@@ -158,10 +159,10 @@ const DEBUG_ZONES: [string, string, string, boolean][] = [
 function DebugLayer({ on }: { on: boolean }) {
   return (
     <div data-debug="1" style={{ position: 'absolute', inset: 0, zIndex: 10000, pointerEvents: 'none', display: on ? 'block' : 'none' }}>
-      <div data-dz="readout" style={{ position: 'absolute', zIndex: 2, font: MONO, color: '#ffffff', background: 'rgba(0,0,0,.75)', border: '2px solid #ffffff', padding: '4px 10px', whiteSpace: 'nowrap' }} />
+      <div data-dz="readout" style={{ position: 'absolute', zIndex: 2, font: DEBUG_FONT, color: '#ffffff', background: 'rgba(0,0,0,.75)', border: '2px solid #ffffff', padding: '4px 10px', whiteSpace: 'nowrap' }} />
       {DEBUG_ZONES.map(([id, c, label, dashed]) => (
         <div key={id} data-dz={id} style={{ position: 'absolute', border: `3px ${dashed ? 'dashed' : 'solid'} ${c}`, boxSizing: 'border-box' }}>
-          <span style={{ position: 'absolute', left: 6, top: 3, font: MONO, color: c, background: 'rgba(0,0,0,.6)', padding: '0 6px', whiteSpace: 'nowrap' }}>{label}</span>
+          <span style={{ position: 'absolute', left: 6, top: 3, font: DEBUG_FONT, color: c, background: 'rgba(0,0,0,.6)', padding: '0 6px', whiteSpace: 'nowrap' }}>{label}</span>
         </div>
       ))}
     </div>
@@ -185,7 +186,7 @@ function Phone({ v }: { v: View }) {
       {v.screen ? (
         <div style={{ ...screenBox, overflow: 'hidden', backgroundColor: '#fff', backgroundImage: `url("${v.screen}")`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }} />
       ) : (
-        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: "'Inter', sans-serif", textAlign: 'center', padding: '0 24px' }}>
+        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: INTER, textAlign: 'center', padding: '0 24px' }}>
           <div style={{ fontSize: 34 }}>＋</div>
           <div style={{ fontSize: 18, fontWeight: 600 }}>Upload a screen<br />for this brand</div>
         </div>
@@ -217,7 +218,7 @@ export const PromoCanvas = forwardRef<HTMLDivElement, { fmt: TemplateKey; v: Vie
     : { inset: 0, left: v.colLeft, top: v.colTop };
   const bottomBall = <Ball geo={g.ballBottom} url={v.ballBottomUrl} size={v.ballBottomSize} transform={v.ballBottomTransform} />;
   return (
-    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: "'Inter', sans-serif" }}>
+    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: INTER }}>
       <img src={asset('assets/comm-bg-wave.svg')} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', WebkitMaskImage: WAVE_MASK, maskImage: WAVE_MASK }} />
       <Ball geo={g.ballTop} url={v.ballTopUrl} size={v.ballTopSize} transform={v.ballTopTransform} />
       {!g.bottomBallLast && bottomBall}

@@ -28,6 +28,10 @@ The standalone file (about 18 MB) bundles every logo, ball, font and library. Ed
 - **Per-graphic panels:** ball position, colour overrides, the Covers logo toggle, and on Banner + App Screen only, the phone screenshot plus the arrow and code overlay.
 - **Show zones:** draws the zone grid and a size readout on the structured layouts. It is never included in exports.
 
+## Fonts
+
+Licensing: **Founders Grotesk Bold** is used only for the offer text (eyebrow, headline, sub line) and the promo code (pill and phone overlay). Everything else, including the editor UI, the "USE PROMO CODE:" label, T&Cs and the debug readout, uses **Inter**. Both live in `src/fonts/` and are bundled into the build. Don't add other paid fonts without checking their web licence.
+
 ## Code map
 
 | Path | What it holds |

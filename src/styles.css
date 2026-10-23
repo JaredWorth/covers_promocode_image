@@ -1,7 +1,4 @@
 @font-face { font-family: 'Founders Grotesk'; src: url('./fonts/FoundersGrotesk-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
-@font-face { font-family: 'Aeonik Fono'; src: url('./fonts/AeonikFono-Regular.otf') format('opentype'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Aeonik Fono'; src: url('./fonts/AeonikFono-Bold.otf') format('opentype'); font-weight: 700; font-display: swap; }
-@font-face { font-family: 'Aeonik Fono'; src: url('./fonts/AeonikFono-Black.otf') format('opentype'); font-weight: 900; font-display: swap; }
 @font-face { font-family: 'Inter'; src: url('./fonts/Inter-Regular.ttf'); font-weight: 400; font-display: swap; }
 @font-face { font-family: 'Inter'; src: url('./fonts/Inter-Medium.ttf'); font-weight: 500; font-display: swap; }
 @font-face { font-family: 'Inter'; src: url('./fonts/Inter-SemiBold.ttf'); font-weight: 600; font-display: swap; }
@@ -12,7 +9,6 @@ body { margin: 0; background: #080b0e; }
 ::-webkit-scrollbar-thumb { background: #222c36; border-radius: 8px; border: 3px solid #080b0e; }
 
 .app { min-height: 100vh; background: radial-gradient(120% 80% at 80% 0%, #11161c 0%, #080b0e 60%); font-family: 'Inter', sans-serif; }
-.mono { font-family: 'IBM Plex Mono', monospace; }
 
 /* ---- Form controls ---- */
 .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #8a93a0; font-weight: 600; margin-bottom: 6px; display: block; }
