@@ -19,6 +19,8 @@ npm run build             # static site in dist/
 npm run build:standalone  # one self-contained HTML file in dist-standalone/index.html
 ```
 
+Every push to `promo-builder-app` also builds the app and publishes it to GitHub Pages (`.github/workflows/pages.yml`). That site is public: anyone with the URL can open it.
+
 The standalone file (about 18 MB) bundles every logo, ball, font and library. Editors can open it straight from disk with no network connection, the same way the prototype's `Covers Promo Builder.html` was used.
 
 ## How it works
