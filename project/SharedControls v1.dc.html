@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:'Inter',sans-serif;background:#0e1318;border:1px solid #1b2530;border-radius:14px;padding:18px 20px">
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px">
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6b78;font-weight:700;color:#FD5000">All graphics</div>
+    <div style="font-size:12px;color:#8a93a0">Edits here apply to all three graphics</div>
+  </div>
+  <sc-if value="{{ data.fitWarn }}" hint-placeholder-val="">
+    <div style="background:#2a0f10;border:1px solid #d83a3a;color:#ff8a8a;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:14px">Text can't fit at minimum size: {{ data.fitWarn }}. Shorten the copy.</div>
+  </sc-if>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Brand</label>
+        <select value="{{ data.bookId }}" onChange="{{ data.h.book }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif">
+          <sc-for list="{{ books }}" as="bk" hint-placeholder-count="6"><option value="{{ bk.id }}">{{ bk.name }}</option></sc-for>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Ball A</label>
+          <select value="{{ data.ballTop }}" onChange="{{ data.h.ballTop }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif">
+            <sc-for list="{{ balls }}" as="bl" hint-placeholder-count="6"><option value="{{ bl.id }}">{{ bl.name }}</option></sc-for>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Ball B</label>
+          <select value="{{ data.ballBottom }}" onChange="{{ data.h.ballBottom }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif">
+            <sc-for list="{{ balls }}" as="bl2" hint-placeholder-count="6"><option value="{{ bl2.id }}">{{ bl2.name }}</option></sc-for>
+          </select>
+        </div>
+      </div>
+      <sc-if value="{{ data.hasHeroAccent }}" hint-placeholder-val="">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" checked="{{ data.heroAccentOn }}" onChange="{{ data.h.heroAccent }}" style="width:17px;height:17px;accent-color:#FD5000;cursor:pointer;margin:0"/>
+          <span style="font-size:13px;color:#cdd6df;font-weight:600">Brand accent on hero text</span>
+        </label>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ data.structured }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Offer type · one-click fill</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ data.quick }}" as="qo" hint-placeholder-count="5"><button onClick="{{ qo.pick }}" style="background:{{ qo.bg }};color:{{ qo.color }};border:1px solid {{ qo.border }};border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">{{ qo.name }}</button></sc-for></div>
+        </div>
+        <sc-if value="{{ data.isBG }}" hint-placeholder-val="{{ true }}">
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Offer (use / for the second line)</label><input type="text" value="{{ data.betGet }}" onChange="{{ data.h.betGet }}" onInput="{{ data.h.betGet }}" placeholder="e.g. BET $5 / GET $150" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Qualifier (optional)</label><input type="text" value="{{ data.qualifier }}" onChange="{{ data.h.qualifier }}" onInput="{{ data.h.qualifier }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+        </sc-if>
+        <sc-if value="{{ data.isAM }}" hint-placeholder-val="">
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Lead-in (optional)</label><input type="text" value="{{ data.leadin }}" onChange="{{ data.h.leadin }}" onInput="{{ data.h.leadin }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+          <div style="display:flex;gap:10px"><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Amount</label><input type="text" value="{{ data.amt }}" onChange="{{ data.h.amt }}" onInput="{{ data.h.amt }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Name</label><input type="text" value="{{ data.name }}" onChange="{{ data.h.name }}" onInput="{{ data.h.name }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+        </sc-if>
+        <sc-if value="{{ data.isMT }}" hint-placeholder-val="">
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Label (optional)</label><input type="text" value="{{ data.label }}" onChange="{{ data.h.label }}" onInput="{{ data.h.label }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+          <div style="display:flex;gap:10px"><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Percent</label><input type="text" value="{{ data.pct }}" onChange="{{ data.h.pct }}" onInput="{{ data.h.pct }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div>
+            <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Word</label>
+              <select value="{{ data.word }}" onChange="{{ data.h.word }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"><option value="MATCH">MATCH</option><option value="BONUS">BONUS</option></select>
+            </div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Cap amount</label><input type="text" value="{{ data.cap }}" onChange="{{ data.h.cap }}" onInput="{{ data.h.cap }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+        </sc-if>
+        <sc-if value="{{ data.isCU }}" hint-placeholder-val="">
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Line 1</label><input type="text" value="{{ data.c1 }}" onChange="{{ data.h.c1 }}" onInput="{{ data.h.c1 }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+          <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Line 2 (optional)</label><input type="text" value="{{ data.c2 }}" onChange="{{ data.h.c2 }}" onInput="{{ data.h.c2 }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+        </sc-if>
+      </sc-if>
+      <sc-if value="{{ data.single }}" hint-placeholder-val="">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">{{ data.hlLabel }}</label>
+          <input type="text" value="{{ data.amount }}" onChange="{{ data.h.amount }}" onInput="{{ data.h.amount }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/>
+        </div>
+      </sc-if>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" checked="{{ data.showPromo }}" onChange="{{ data.h.togglePromo }}" style="width:17px;height:17px;accent-color:#FD5000;cursor:pointer;margin:0"/>
+        <span style="font-size:13px;color:#cdd6df;font-weight:600">Use promo code</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" checked="{{ data.showZones }}" onChange="{{ data.h.toggleZones }}" style="width:17px;height:17px;accent-color:#FD5000;cursor:pointer;margin:0"/>
+        <span style="font-size:13px;color:#cdd6df;font-weight:600">Show zones <span style="color:#6b7682;font-weight:400">(debug · not exported)</span></span>
+      </label>
+      <sc-if value="{{ data.showPromo }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Promo label</label><input type="text" value="{{ data.promoLabel }}" onChange="{{ data.h.promoLabel }}" onInput="{{ data.h.promoLabel }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Promo code</label><input type="text" value="{{ data.code }}" onChange="{{ data.h.code }}" onInput="{{ data.h.code }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.04em"/></div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ data.tcsLocked }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">T&amp;Cs (set by brand · read-only)</label>
+          <textarea readonly="{{ true }}" value="{{ data.lockedTcs }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;min-height:96px;height:96px;resize:none;line-height:1.45;display:block;color:#8a93a0;cursor:not-allowed"></textarea>
+        </div>
+        <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">State note (optional, appended to T&Cs)</label><input type="text" value="{{ data.stateNote }}" onChange="{{ data.h.stateNote }}" onInput="{{ data.h.stateNote }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+      </sc-if>
+      <sc-if value="{{ data.single }}" hint-placeholder-val="">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">T&amp;Cs text</label>
+          <textarea value="{{ data.tcs }}" onChange="{{ data.h.tcs }}" onInput="{{ data.h.tcs }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;min-height:120px;height:150px;resize:vertical;line-height:1.45;display:block"></textarea>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400"><defs>
+  <radialGradient id="ga" cx="36%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#fff6d8"></stop>
+    <stop offset="22%" stop-color="#e9cf7e"></stop>
+    <stop offset="55%" stop-color="#b8923c"></stop>
+    <stop offset="82%" stop-color="#6e561f"></stop>
+    <stop offset="100%" stop-color="#3a2c10"></stop>
+  </radialGradient>
+  <radialGradient id="hia" cx="34%" cy="26%" r="30%">
+    <stop offset="0%" stop-color="#fffefb" stop-opacity="0.95"></stop>
+    <stop offset="100%" stop-color="#fffefb" stop-opacity="0"></stop>
+  </radialGradient></defs>
+  <circle cx="200" cy="200" r="180" fill="url(#ga)"></circle>
+  <circle cx="200" cy="200" r="180" fill="url(#hia)"></circle>
+  <g fill="none" stroke="#7a2418" stroke-width="5">
+    <path d="M86 56 q70 144 0 288"></path>
+    <path d="M314 56 q-70 144 0 288"></path>
+    <line x1="92" y1="64" x2="108" y2="55"></line><line x1="92" y1="64" x2="108" y2="73"></line><line x1="92" y1="90" x2="108" y2="81"></line><line x1="92" y1="90" x2="108" y2="99"></line><line x1="92" y1="116" x2="108" y2="107"></line><line x1="92" y1="116" x2="108" y2="125"></line><line x1="92" y1="142" x2="108" y2="133"></line><line x1="92" y1="142" x2="108" y2="151"></line><line x1="92" y1="168" x2="108" y2="159"></line><line x1="92" y1="168" x2="108" y2="177"></line><line x1="92" y1="194" x2="108" y2="185"></line><line x1="92" y1="194" x2="108" y2="203"></line><line x1="92" y1="220" x2="108" y2="211"></line><line x1="92" y1="220" x2="108" y2="229"></line><line x1="92" y1="246" x2="108" y2="237"></line><line x1="92" y1="246" x2="108" y2="255"></line><line x1="92" y1="272" x2="108" y2="263"></line><line x1="92" y1="272" x2="108" y2="281"></line>
+    <line x1="308" y1="64" x2="292" y2="55"></line><line x1="308" y1="64" x2="292" y2="73"></line><line x1="308" y1="90" x2="292" y2="81"></line><line x1="308" y1="90" x2="292" y2="99"></line><line x1="308" y1="116" x2="292" y2="107"></line><line x1="308" y1="116" x2="292" y2="125"></line><line x1="308" y1="142" x2="292" y2="133"></line><line x1="308" y1="142" x2="292" y2="151"></line><line x1="308" y1="168" x2="292" y2="159"></line><line x1="308" y1="168" x2="292" y2="177"></line><line x1="308" y1="194" x2="292" y2="185"></line><line x1="308" y1="194" x2="292" y2="203"></line><line x1="308" y1="220" x2="292" y2="211"></line><line x1="308" y1="220" x2="292" y2="229"></line><line x1="308" y1="246" x2="292" y2="237"></line><line x1="308" y1="246" x2="292" y2="255"></line><line x1="308" y1="272" x2="292" y2="263"></line><line x1="308" y1="272" x2="292" y2="281"></line>
+  </g></svg>

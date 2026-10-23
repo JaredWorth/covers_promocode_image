@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400"><defs>
+  <radialGradient id="gf" cx="36%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#fff6d8"></stop>
+    <stop offset="22%" stop-color="#e9cf7e"></stop>
+    <stop offset="55%" stop-color="#b8923c"></stop>
+    <stop offset="82%" stop-color="#6e561f"></stop>
+    <stop offset="100%" stop-color="#3a2c10"></stop>
+  </radialGradient>
+  <radialGradient id="hif" cx="34%" cy="26%" r="30%">
+    <stop offset="0%" stop-color="#fffefb" stop-opacity="0.95"></stop>
+    <stop offset="100%" stop-color="#fffefb" stop-opacity="0"></stop>
+  </radialGradient></defs>
+  <g transform="rotate(-32 200 200)">
+    <ellipse cx="200" cy="200" rx="180" ry="108" fill="url(#gf)"></ellipse>
+    <ellipse cx="200" cy="200" rx="180" ry="108" fill="url(#hif)"></ellipse>
+    <line x1="120" y1="200" x2="280" y2="200" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line>
+    <line x1="144" y1="184" x2="144" y2="216" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line><line x1="172" y1="184" x2="172" y2="216" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line><line x1="200" y1="184" x2="200" y2="216" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line><line x1="228" y1="184" x2="228" y2="216" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line><line x1="256" y1="184" x2="256" y2="216" stroke="#4a3a16" stroke-width="6" stroke-linecap="round"></line>
+    <path d="M70 200 q130 -150 260 0 q-130 150 -260 0" fill="none" stroke="#2b2009" stroke-width="3" opacity="0.5"></path>
+  </g></svg>

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400"><defs>
+  <radialGradient id="gs" cx="36%" cy="30%" r="80%">
+    <stop offset="0%" stop-color="#fff6d8"></stop>
+    <stop offset="22%" stop-color="#e9cf7e"></stop>
+    <stop offset="55%" stop-color="#b8923c"></stop>
+    <stop offset="82%" stop-color="#6e561f"></stop>
+    <stop offset="100%" stop-color="#3a2c10"></stop>
+  </radialGradient>
+  <radialGradient id="his" cx="34%" cy="26%" r="30%">
+    <stop offset="0%" stop-color="#fffefb" stop-opacity="0.95"></stop>
+    <stop offset="100%" stop-color="#fffefb" stop-opacity="0"></stop>
+  </radialGradient></defs>
+  <circle cx="200" cy="200" r="180" fill="url(#gs)"></circle>
+  <circle cx="200" cy="200" r="180" fill="url(#his)"></circle>
+  <g fill="#2b2009" opacity="0.78" stroke="#1c1506" stroke-width="3">
+    <polygon points="200,150 234,176 221,216 179,216 166,176"></polygon>
+    <polygon points="200,40 232,58 226,92 200,104 174,92 168,58"></polygon>
+    <polygon points="60,150 92,140 112,170 96,202 64,196"></polygon>
+    <polygon points="340,150 308,140 288,170 304,202 336,196"></polygon>
+    <polygon points="130,300 164,286 192,308 178,344 142,344"></polygon>
+    <polygon points="270,300 236,286 208,308 222,344 258,344"></polygon>
+  </g>
+  <g fill="none" stroke="#3a2c10" stroke-width="3" opacity="0.5">
+    <path d="M200 104 L234 176 M200 104 L166 176 M221 216 L142 344 M179 216 L258 344 M112 170 L166 176 M288 170 L234 176"></path>
+  </g></svg>
