@@ -897,6 +897,7 @@ class Component extends DCLogic {
     for(let i = 0; i < 16; i++){ const m = (lo + hi) / 2; apply(m); if(ok()) lo = m; else hi = m; }
     
     if(!warn && (this.state.cat === 'predictions' || (key !== 't1' && !this.state[key].showPromo))) lo *= .8;
+    if(!warn && key === 't3') lo *= .8;
     const ref = Math.floor(lo); apply(ref);
     const h = st.offsetHeight, mw = Math.max(0, ...heroes.map(e => e.offsetWidth), ev ? eye.offsetWidth : 0);
     const f = warn ? Math.min(1, h ? avail / h : 1, mw ? W / mw : 1) : 1;

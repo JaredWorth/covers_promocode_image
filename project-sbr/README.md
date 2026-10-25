@@ -35,7 +35,7 @@ Stack, centred, Factoria 700 uppercase, `white-space:nowrap`:
 - eyebrow (small, line-height .75)
 - hero line 1 & 2 (letter-spacing −.01em, line-height .88)
 - sub-line / qualifier (line-height .75). A **gap is inserted between sub-line segments for comma separation**.
-The stack is auto-scaled (`transform`) to fit the offer zone. Hero colour = `heroColor` (brand accent when `heroAccent:true`, e.g. bet365, DraftKings; otherwise text colour). Legacy "single" mode: amount 250px (Square) / 205px (Wide) / 182px (App), offer line 68/57/52px, letter-spacing −2/−3px.
+On **Banner + App Screen** the fitted hero size is multiplied by an extra **0.8** (offer text 20% smaller; stacks with the existing ×0.8 for prediction markets / no-promo; see `fitStack`). The stack is auto-scaled (`transform`) to fit the offer zone. Hero colour = `heroColor` (brand accent when `heroAccent:true`, e.g. bet365, DraftKings; otherwise text colour). Legacy "single" mode: amount 250px (Square) / 205px (Wide) / 182px (App), offer line 68/57/52px, letter-spacing −2/−3px.
 
 ### Promo-code pill
 Vertical unit, radius 10px, overflow hidden, shadow `0 8px 19px rgba(0,0,0,.25)`, `width:fit-content`:

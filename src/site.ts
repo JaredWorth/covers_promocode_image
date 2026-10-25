@@ -54,6 +54,8 @@ export interface Site {
     wideNoCodeFill: boolean;
     /** Extra gap between logo and offer, as a multiple of the base gap. */
     logoGap: number;
+    /** Extra scale on the fitted offer text on Banner + App Screen (SBR: 0.8). */
+    appHeroScale: number;
   };
   theme: Record<string, string>;
 }
@@ -95,7 +97,7 @@ export const COVERS: Site = {
   textLogo: false,
   footer: { light: 'assets/covers-logo.svg', dark: 'assets/covers-logo-dark.svg', h: { t1: 54, t2: 34, t3: 0 } },
   footerName: 'Covers',
-  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: null, wideNoCodeFill: false, logoGap: 1 },
+  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: null, wideNoCodeFill: false, logoGap: 1, appHeroScale: 1 },
   theme: COVERS_THEME,
 };
 
@@ -120,7 +122,7 @@ export const SI: Site = {
   textLogo: true,
   footer: { light: 'assets/si-logo.svg', dark: 'assets/si-logo-dark.svg', h: { t1: 106, t2: 67, t3: 0 } },
   footerName: 'SI',
-  layout: { wideX: [170, 1124], heroMaxWide: 290, subGapRatio: 0.95, subMarginRatio: null, wideNoCodeFill: true, logoGap: 1.5 },
+  layout: { wideX: [170, 1124], heroMaxWide: 290, subGapRatio: 0.95, subMarginRatio: null, wideNoCodeFill: true, logoGap: 1.5, appHeroScale: 1 },
   theme: SI_THEME,
 };
 
@@ -171,7 +173,7 @@ export const SBR: Site = {
   textLogo: false,
   footer: { light: 'assets/sbr-logo.svg', dark: 'assets/sbr-logo-dark.svg', h: { t1: 54, t2: 34, t3: 0 } },
   footerName: 'SBR',
-  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: 0.08, wideNoCodeFill: false, logoGap: 1 },
+  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: 0.08, wideNoCodeFill: false, logoGap: 1, appHeroScale: 0.8 },
   theme: SBR_THEME,
 };
 

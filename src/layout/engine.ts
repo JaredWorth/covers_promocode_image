@@ -206,6 +206,7 @@ export class LayoutEngine {
     apply(lo); if (!ok()) warn = true;
     for (let i = 0; i < 16; i++) { const m = (lo + hi) / 2; apply(m); if (ok()) lo = m; else hi = m; }
     if (!warn && (inp.cat === 'predictions' || (key !== 't1' && !inp.state.showPromo))) lo *= fill ? 0.85 : 0.8;
+    if (!warn && key === 't3') lo *= this.site.layout.appHeroScale;
     const ref = Math.floor(lo); apply(ref);
     const h = st.offsetHeight, mw = Math.max(0, ...heroes.map(e => e.offsetWidth), ev ? eye!.offsetWidth : 0);
     const f = warn ? Math.min(1, h ? avail / h : 1, mw ? W / mw : 1) : 1;
