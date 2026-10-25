@@ -25,6 +25,10 @@ The Sportsbook Review version lives at `/sbr/` (from `project-sbr/SBR Promo Buil
 
 Everything that differs between the sites is in `src/site.ts`. On rebranded sites, Covers house codes (`COVERS…`) in the brand data become the site's code; brand-specific codes such as Kalshi's `MAX60` are kept.
 
+### Commercial Editor Tools (landing page)
+
+`/tools/` (from `project-tools/Editor Tools.dc.html`) is the entry point for editors. They pick Covers, Sports Illustrated or Sportsbook Review; the pick is remembered in the browser, and keys 1/2/3 switch it. The page then links to that brand's tools: the Logo Generator, the matching Promo Code Image Editor on this site, and the Mobile Screenshot Generator. Links are set in `src/tools/Tools.tsx`. The guide links and the "Request on Slack" link are still placeholders (`#`).
+
 ## Running it
 
 ```bash
@@ -36,7 +40,7 @@ npm run build:standalone:si  # SI as one self-contained HTML file: dist-standalo
 npm run build:standalone:sbr # SBR as one self-contained HTML file: dist-standalone/sbr/index.html
 ```
 
-Every push to `promo-builder-app` also builds both pages and publishes them to GitHub Pages (`.github/workflows/pages.yml`): Covers at `/`, SI at `/si/`, SBR at `/sbr/`. That site is public: anyone with the URL can open it.
+Every push to `promo-builder-app` also builds both pages and publishes them to GitHub Pages (`.github/workflows/pages.yml`): Covers at `/`, SI at `/si/`, SBR at `/sbr/`, and the landing page at `/tools/`. That site is public: anyone with the URL can open it.
 
 The standalone file (about 18 MB) bundles every logo, ball, font and library. Editors can open it straight from disk with no network connection, the same way the prototype's `Covers Promo Builder.html` was used.
 

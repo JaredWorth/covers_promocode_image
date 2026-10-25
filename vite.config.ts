@@ -2,8 +2,9 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
-// One codebase, one page per site: Covers at /, SI at /si/, SBR at /sbr/.
-const PAGES = { main: 'index.html', si: 'si/index.html', sbr: 'sbr/index.html' };
+// One codebase, one page per site: Covers at /, SI at /si/, SBR at /sbr/, plus the
+// Commercial Editor Tools landing page at /tools/.
+const PAGES = { main: 'index.html', si: 'si/index.html', sbr: 'sbr/index.html', tools: 'tools/index.html' };
 
 // `--mode standalone` inlines every script, font and image into one HTML file
 // that editors can open offline. It builds one site at a time: `--mode standalone-si` / `standalone-sbr`.

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Sora:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#e8ebef;color:#14161c;font-family:"Sora",system-ui,sans-serif;font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+a{color:#14161c;text-decoration:none}
+a:hover{color:#d81b7a}
+:focus-visible{outline:2px solid #d81b7a;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column">
+  <header style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:22px 20px 16px;border-bottom:1px solid #ccd3dc">
+    <div style="display:flex;align-items:center;gap:12px;margin-right:auto">
+      <svg viewBox="0 0 191 136" fill="none" aria-hidden="true" style="height:30px;width:auto;display:block;flex:none"><path d="M149.311 66.9269C150.17 66.0012 151.02 65.0688 151.872 64.1231C151.969 64.0188 151.845 63.8494 151.715 63.9081C150.812 64.2991 149.916 64.6905 149.019 65.0815C147.817 65.6032 146.615 66.1182 145.42 66.6332C144.647 66.9659 143.873 67.2919 143.107 67.6238C132.791 72.031 122.909 76.0668 113.651 79.64C30.7653 111.633 -2.18644 106.659 151.716 0.411018C151.955 0.247639 151.716 -0.0976839 151.443 0.0263353C-71.2337 103.092 -7.98259 168.065 86.2153 118.133C106.362 106.698 128.106 89.9016 149.312 66.9265L149.311 66.9269Z" fill="#040A1E"></path><path d="M190.247 25.3757C180.925 31.8889 164.326 31.8889 155.003 25.3757C154.724 25.1804 154.392 25.5127 154.587 25.7927C160.654 34.4774 161.064 49.4792 155.822 59.0309C155.438 59.7283 155.03 60.4067 154.587 61.039C154.393 61.3193 154.724 61.652 155.003 61.456C155.906 60.8233 156.894 60.2759 157.92 59.7672C167.489 55.0207 181.828 55.5751 190.247 61.456C190.527 61.6513 190.858 61.319 190.663 61.039C184.148 51.7157 184.148 35.1097 190.663 25.786C190.858 25.5056 190.526 25.1729 190.247 25.369V25.3757Z" fill="#040A1E"></path></svg>
+      <div>
+        <h1 style="margin:0;font-size:19px;font-weight:700;letter-spacing:-.017em">Commercial Editor Tools</h1>
+        <p style="margin:1px 0 0;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8b95a3">Pick your brand · open a tool</p>
+      </div>
+    </div>
+    <a href="#help" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;border:1px solid #ccd3dc;background:#fff;border-radius:2px;padding:9px 12px">Ask a designer</a>
+  </header>
+
+  <main style="flex:1;width:100%;max-width:1120px;margin:0 auto;padding:32px 20px 48px;display:flex;flex-direction:column;gap:36px">
+    <section style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8b95a3">01 · Which brand are you editing for?</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8b95a3">{{ brandHint }}</span>
+      </div>
+      <div role="radiogroup" aria-label="Brand" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+        <sc-for list="{{ brands }}" as="b" hint-placeholder-count="3">
+          <button role="radio" aria-checked="{{ b.checked }}" onClick="{{ b.pick }}" style="cursor:pointer;text-align:left;font-family:'Sora',sans-serif;background:{{ b.bg }};color:{{ b.fg }};border:1px solid {{ b.border }};border-radius:2px;padding:16px 16px 14px;display:flex;align-items:center;gap:14px;transition:border-color .12s,background .12s" style-hover="border-color:#d81b7a">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid {{ b.keyBorder }};border-radius:2px;color:{{ b.keyFg }}">{{ b.key }}</span>
+            <span style="display:flex;flex-direction:column;gap:8px;min-width:0;flex:1">
+              <span style="height:30px;display:flex;align-items:center"><img src="{{ b.logo }}" alt="{{ b.name }}" style="display:block;max-width:100%;max-height:{{ b.logoH }};width:auto;height:auto"></span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:{{ b.subFg }}">{{ b.state }}</span>
+            </span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:12px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8b95a3">02 · What do you need to do?</span>
+      <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ false }}">
+        <div style="border:1px dashed #ccd3dc;border-radius:2px;background:rgba(255,255,255,.5);padding:44px 24px;text-align:center">
+          <h2 style="margin:0 0 6px;font-size:17px;font-weight:600;letter-spacing:-.015em">Choose your brand first</h2>
+          <p style="margin:0 auto;color:#5c6674;font-size:13.5px;max-width:42ch">Each brand has its own set of tools. We’ll remember your pick next time.</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px">
+          <sc-for list="{{ tools }}" as="t" hint-placeholder-count="3">
+            <a href="{{ t.href }}" target="_blank" rel="noopener" aria-disabled="{{ t.disabled }}" style="opacity:{{ t.op }};pointer-events:{{ t.pe }};background:#fff;border:1px solid #ccd3dc;border-radius:2px;display:flex;flex-direction:column;color:#14161c;transition:border-color .12s" style-hover="border-color:#d81b7a;color:#14161c">
+              <span style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:11px 13px;border-bottom:1px solid #dfe4ea">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500">{{ t.num }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#d81b7a">{{ t.kind }}</span>
+              </span>
+              <span style="padding:28px 22px;background:#f6f8f9;flex:1;display:flex;flex-direction:column;gap:8px;min-height:170px;justify-content:center">
+                <span style="position:relative;align-self:flex-start;padding:2px 4px">
+                  <span style="position:absolute;top:-5px;left:-5px;width:9px;height:9px;border-top:1px solid #d81b7a;border-left:1px solid #d81b7a"></span>
+                  <span style="position:absolute;top:-5px;right:-5px;width:9px;height:9px;border-top:1px solid #d81b7a;border-right:1px solid #d81b7a"></span>
+                  <span style="position:absolute;bottom:-5px;left:-5px;width:9px;height:9px;border-bottom:1px solid #d81b7a;border-left:1px solid #d81b7a"></span>
+                  <span style="position:absolute;bottom:-5px;right:-5px;width:9px;height:9px;border-bottom:1px solid #d81b7a;border-right:1px solid #d81b7a"></span>
+                  <span style="font-size:21px;font-weight:600;letter-spacing:-.02em;line-height:1.2">{{ t.name }}</span>
+                </span>
+                <span style="font-size:13.5px;color:#5c6674;text-wrap:pretty;max-width:34ch;margin-top:6px">{{ t.desc }}</span>
+              </span>
+              <span style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 13px;border-top:1px solid #dfe4ea">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8b95a3;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ t.brandName }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#14161c;color:#fff;border-radius:2px;padding:7px 10px;flex:none">{{ t.cta }}</span>
+              </span>
+            </a>
+          </sc-for>
+        </div>
+      </sc-if>
+    </section>
+
+    <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8b95a3">Guides &amp; standards{{ guideSuffix }}</span>
+        <div style="background:#fff;border:1px solid #ccd3dc;border-radius:2px;display:flex;flex-direction:column">
+          <sc-for list="{{ guides }}" as="g" hint-placeholder-count="4">
+            <a href="{{ g.href }}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;border-top:{{ g.rule }}" style-hover="background:#f6f8f9;color:#d81b7a">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0">
+                <span style="font-size:14px;font-weight:500">{{ g.name }}</span>
+                <span style="font-size:12px;color:#8b95a3">{{ g.desc }}</span>
+              </span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#8b95a3;flex:none">{{ g.type }}</span>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+      <div id="help" style="display:flex;flex-direction:column;gap:12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#8b95a3">Stuck?</span>
+        <div style="background:#14161c;color:#fff;border-radius:2px;padding:22px 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <h2 style="margin:0;font-size:17px;font-weight:600;letter-spacing:-.015em">Contact a designer</h2>
+            <p style="margin:0;font-size:13.5px;color:#c3cad3;text-wrap:pretty">If a tool can’t do what you need, or an asset doesn’t look right, the commercial design team can help.</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="#" style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:#d81b7a;color:#fff;border:1px solid #d81b7a;border-radius:2px;padding:10px 13px" style-hover="background:#fff;color:#14161c;border-color:#fff">Request on Slack</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer style="border-top:1px solid #ccd3dc;padding:14px 20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8b95a3">
+    <span>Legend · Commercial Design</span>
+    <span>Press 1 · 2 · 3 to switch brand</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;brandA&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Covers&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Brands&quot;},&quot;brandB&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sports Illustrated&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Brands&quot;},&quot;brandC&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Sportsbook Review&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Brands&quot;},&quot;remember&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+class Component extends DCLogic {
+  state = { brand: null };
+  KEY = 'editorTools.brand';
+
+  brandList() {
+    const p = this.props;
+    return [
+      { id: 'a', name: p.brandA ?? 'Covers', logo: 'assets/covers.svg', logoH: '30px' },
+      { id: 'b', name: p.brandB ?? 'Sports Illustrated', logo: 'assets/si.svg', logoH: '18px' },
+      { id: 'c', name: p.brandC ?? 'Sportsbook Review', logo: 'assets/sbr.svg', logoH: '26px' },
+    ];
+  }
+
+  // Replace hrefs with each brand's real tool URLs
+  links = {
+    a: { logo: 'https://oliver-clayton.github.io/logo-exporter/', promo: 'https://jaredworth.github.io/covers_promocode_image/', mobile: 'https://jaredworth.github.io/screenshot_builder2/' },
+    b: { logo: 'https://oliver-clayton.github.io/logo-exporter/', promo: 'https://jaredworth.github.io/covers_promocode_image/si/', mobile: 'https://jaredworth.github.io/screenshot_builder2/' },
+    c: { logo: 'https://oliver-clayton.github.io/logo-exporter/', promo: 'https://jaredworth.github.io/covers_promocode_image/sbr/', mobile: 'https://jaredworth.github.io/screenshot_builder2/' },
+  };
+
+  componentDidMount() {
+    if (this.props.remember ?? true) {
+      try { const v = localStorage.getItem(this.KEY); if (v) this.setState({ brand: v }); } catch (e) {}
+    }
+    this.onKey = (e) => {
+      if (e.target.closest && e.target.closest('input,textarea,select')) return;
+      const i = ['1', '2', '3'].indexOf(e.key);
+      if (i >= 0) this.pick(this.brandList()[i].id);
+    };
+    window.addEventListener('keydown', this.onKey);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this.onKey); }
+
+  pick(id) {
+    this.setState({ brand: id });
+    try { localStorage.setItem(this.KEY, id); } catch (e) {}
+  }
+
+  renderVals() {
+    const list = this.brandList();
+    const cur = list.find(b => b.id === this.state.brand);
+    const brands = list.map((b, i) => {
+      const on = cur && b.id === cur.id;
+      return {
+        ...b, key: String(i + 1), checked: on ? 'true' : 'false', pick: () => this.pick(b.id),
+        bg: '#fff', fg: '#14161c', border: on ? '#d81b7a' : '#ccd3dc',
+        keyBorder: on ? '#d81b7a' : '#ccd3dc', keyFg: on ? '#d81b7a' : '#8b95a3',
+        subFg: on ? '#d81b7a' : '#8b95a3', state: on ? 'Selected' : 'Select',
+      };
+    });
+    const L = cur ? this.links[cur.id] : {};
+    const tools = cur ? [
+      { num: '01', kind: 'Generate', name: 'Logo Generator', desc: 'Export partner and brand logo files sized for commercial pages.', href: L.logo },
+      { num: '02', kind: 'Edit', name: 'Promo Code Image Editor', desc: 'Update the code, offer and dates on promo artwork.', href: L.promo },
+      { num: '03', kind: 'Generate', name: 'Mobile Screenshot Generator', desc: 'Drop app screenshots into approved device frames.', href: L.mobile },
+    ].map(t => {
+      const off = !t.href;
+      return { ...t, brandName: off ? cur.name + ' · not available' : cur.name, disabled: off ? 'true' : 'false', op: off ? '.45' : '1', pe: off ? 'none' : 'auto', cta: off ? 'Unavailable' : 'Open →', href: off ? undefined : t.href };
+    }) : [];
+    const guides = [
+      { name: 'Logo usage guide', desc: 'Clear space, sizing and colour rules', type: 'Guide' },
+      { name: 'Promo image standards', desc: 'Copy length, legal lines, approved layouts', type: 'Standard' },
+      { name: 'Screenshot specs', desc: 'Device frames, crops and export sizes', type: 'Spec' },
+      { name: 'Brand standards', desc: 'The full brand book', type: 'PDF' },
+    ].map((g, i) => ({ ...g, href: '#', rule: i ? '1px solid #dfe4ea' : '0' }));
+    return {
+      brands, tools, guides,
+      noBrand: !cur, hasBrand: !!cur,
+      brandHint: cur ? 'Saved for next time' : 'Not chosen yet',
+      guideSuffix: cur ? ' · ' + cur.name : '',
+    };
+  }
+}
+</script>
+</body>
+</html>
