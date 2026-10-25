@@ -43,6 +43,14 @@ export interface Brand {
   logoScale?: number;
   ownPill?: boolean;
   pillEdge?: string;
+  /** SBR: background photo (basketball | football | stars). */
+  bgImg?: string;
+  /** SBR: colour the background photo is tinted to. */
+  tint?: string;
+  /** SBR: main brand colour (pill band, background fallback). */
+  brand?: string;
+  /** SBR: black overlay strength on the tinted photo (0–1). */
+  dark?: number;
 }
 
 export interface Ball {
@@ -74,6 +82,8 @@ export interface TemplateState {
   heroAccentOn: boolean;
   showPromo: boolean;
   showOverlay: boolean;
+  /** SBR: arrow + phone code overlay on Banner + App Screen. */
+  showArrow: boolean;
   showCovers: boolean;
   ballTop: string;
   ballBottom: string;

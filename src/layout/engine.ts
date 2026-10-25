@@ -181,6 +181,8 @@ export class LayoutEngine {
       [ev ? eye : null, sv ? sub : null].forEach(e => {
         if (!e) return;
         e.style.margin = '0px';
+        // SBR: a fixed gap above the sub line.
+        if (e === sub && this.site.layout.subMarginRatio != null) e.style.marginTop = this.site.layout.subMarginRatio * h + 'px';
         const f = 0.5 * h; fs(e, f);
         const w = e.offsetWidth;
         if (w > capW) fs(e, Math.floor(f * capW / w * 10) / 10);
@@ -228,6 +230,7 @@ export class LayoutEngine {
 
   /** Size the promo pill from the fixed spec; shrink the code only if it would overflow. */
   private stylePill(key: TemplateKey, cz: HTMLElement, colW: number) {
+    if (this.site.pill === 'band') return this.styleBand(key, cz, colW);
     const P = PILL[key], s = P.s, h = P.h * s, ring = 0.08 * h, pad = P.pad * s, lab = P.lab * s;
     const max = Math.min(P.max * s, colW - 2 * ring), min = Math.min(P.min * s, max);
     const u = cz.firstElementChild as HTMLElement, lb = u.children[0] as HTMLElement;
@@ -237,13 +240,34 @@ export class LayoutEngine {
     Object.assign(pill.style, {
       height: h + 'px', minWidth: min + 'px', maxWidth: max + 'px', padding: '0 ' + pad + 'px', boxSizing: 'border-box',
       marginTop: P.gap * s + ring + 'px',
-      boxShadow: this.site.plainPill ? '0 18px 50px rgba(0,0,0,.45)' : '0 0 0 ' + ring + 'px ' + (pill.dataset.ring || 'transparent') + ',0 18px 50px rgba(0,0,0,.45)',
+      boxShadow: this.site.pill === 'plain' ? '0 18px 50px rgba(0,0,0,.45)' : '0 0 0 ' + ring + 'px ' + (pill.dataset.ring || 'transparent') + ',0 18px 50px rgba(0,0,0,.45)',
     });
     let f = P.fs * s; cp.style.fontSize = f + 'px';
     const inner = max - 2 * pad - 16;
     while (cp.scrollWidth > inner && f > lab + 1) { f--; cp.style.fontSize = f + 'px'; }
-    if (this.site.plainPill) this.centerCode(cp);
+    if (this.site.pill === 'plain') this.centerCode(cp);
     return { need: u.offsetHeight + 2 * ring, w: pill.offsetWidth, h: pill.offsetHeight, f, P, maxU: max / s };
+  }
+
+  /**
+   * SBR two-band pill: every dimension is a fraction of the unit width. Grow the width in
+   * 10px steps from the minimum until the code fits 90% of it, then shrink the code if needed.
+   */
+  private styleBand(key: TemplateKey, cz: HTMLElement, colW: number) {
+    const P = PILL[key], s = P.s, lab = P.lab * s, max = Math.min(P.max * s, colW), min = Math.min(P.min * s, max);
+    const u = cz.firstElementChild as HTMLElement, lb = u.children[0] as HTMLElement;
+    const pill = u.querySelector<HTMLElement>('[data-pill]')!, cp = pill.querySelector<HTMLElement>('[data-code]')!;
+    u.style.transform = 'none';
+    const set = (w: number, f: number) => {
+      u.style.width = w + 'px'; u.style.maxWidth = 'none';
+      Object.assign(lb.style, { height: 0.095 * w + 'px', fontSize: 0.052 * w + 'px', padding: '0', display: 'flex', alignItems: 'center', justifyContent: 'center' });
+      Object.assign(pill.style, { height: 0.173 * w + 'px', padding: '0 ' + 0.05 * w + 'px', boxSizing: 'border-box' });
+      cp.style.fontSize = f + 'px';
+    };
+    let w = min, f: number;
+    for (;;) { f = 0.135 * w; set(w, f); if (cp.scrollWidth <= w * 0.9 || w >= max) break; w = Math.min(max, w + 10); }
+    while (cp.scrollWidth > w * 0.9 && f > lab) { f--; cp.style.fontSize = f + 'px'; }
+    return { need: u.offsetHeight, w: u.offsetWidth, h: Math.max(u.offsetHeight, P.h * s), f, P, maxU: max / s };
   }
 
   /** Zone grid for one format. Returns a warning label ('' when everything fits). */
@@ -267,7 +291,8 @@ export class LayoutEngine {
     };
     const wideFill = L.wideNoCodeFill && key === 't2' && !s.showPromo;
     const base: [number, number] = wideFill ? [mW, W - mW] : [Math.max(mW, xl), Math.min(W - mW, xr)], mid = (base[0] + base[1]) / 2;
-    const circ = ([[C.bt, s.ballTopDX, s.ballTopDY], [C.bb, s.ballBottomDX, s.ballBottomDY]] as [Circle, number, number][])
+    // Ball keep-outs only exist where the site draws balls (Covers).
+    const circ = (this.site.decor === 'balls' ? [[C.bt, s.ballTopDX, s.ballTopDY], [C.bb, s.ballBottomDX, s.ballBottomDY]] as [Circle, number, number][] : [])
       .map(([c, dx, dy]) => ({ x: c.x + (dx || 0), y: c.y + (dy || 0), r: 0.46 * c.s + 24 }));
     // Horizontal span between y0..y1; on Banner + App it narrows to clear the balls.
     const span = (y0: number, y1: number): [number, number] => {
@@ -327,7 +352,7 @@ export class LayoutEngine {
     const lT = le ? le.offsetTop + lk.t * le.offsetHeight : 0, lB = le ? le.offsetTop + lk.b * le.offsetHeight : logoH;
     const sv = ([...oz.querySelectorAll('[data-role="small"],[data-role="hero"],[data-role="qual"]')] as HTMLElement[]).filter(vis);
     const oi0 = sv.length ? this.inkIns(sv[0])[0] : 0, oi1 = sv.length ? this.inkIns(sv[sv.length - 1])[1] : 0, ti = this.inkIns(te);
-    const ring = cz ? 0.08 * PILL[key].h * PILL[key].s : 0;
+    const ring = cz && this.site.pill !== 'band' ? 0.08 * PILL[key].h * PILL[key].s : 0;
     const uH = pv ? pv.need - 2 * ring : 0, Ch = pv ? pv.need - ring : 0, nG = cz ? 3 : 2;
     const G = 60 / 1080 * H, Lh = lB - lT, Oh = res.h - oi0 - oi1, Th = fine - ti[0] - ti[1];
     const tot = Lh + Oh + Th + Ch + nG * G + (L.logoGap - 1) * G;
@@ -385,7 +410,11 @@ export class LayoutEngine {
   run(cat: CategoryId, showZones: boolean, states: Record<TemplateKey, TemplateState>, roots: Record<TemplateKey, HTMLElement | null>): string {
     if (cat === 'casino' || cat === 'sweepstakes') { this.runSingle(roots); return ''; }
     return this.site.templates
-      .map(k => { const r = this.layoutKey(k, { cat, showZones, state: states[k], root: roots[k] }); return r ? FORMAT_NAMES[k] + ' (' + r + ')' : ''; })
+      .map(k => {
+        let r = '';
+        try { r = this.layoutKey(k, { cat, showZones, state: states[k], root: roots[k] }); } catch (e) { console.warn('layout', k, e); }
+        return r ? FORMAT_NAMES[k] + ' (' + r + ')' : '';
+      })
       .filter(Boolean).join(', ');
   }
 }

@@ -5,3 +5,5 @@ dist-standalone
 
 # Industry (SI) is not committed until its web licence is confirmed; drop the files in src/fonts/ to use them.
 src/fonts/Industry-*
+# Factoria (SBR) likewise, pending its web licence.
+src/fonts/Factoria-*

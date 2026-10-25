@@ -9,9 +9,13 @@
     "build:standalone": "tsc -b && vite build --mode standalone",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "build:standalone:si": "tsc -b && vite build --mode standalone-si"
+    "build:standalone:si": "tsc -b && vite build --mode standalone-si",
+    "build:standalone:sbr": "tsc -b && vite build --mode standalone-sbr"
   },
   "dependencies": {
+    "@fontsource/barlow": "5.2.6",
+    "@fontsource/ibm-plex-mono": "5.2.6",
+    "@fontsource/roboto-slab": "5.2.6",
     "html-to-image": "1.11.11",
     "jszip": "3.10.1",
     "react": "18.3.1",

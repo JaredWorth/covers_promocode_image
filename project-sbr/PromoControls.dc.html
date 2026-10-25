@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:'Inter',sans-serif;background:#0e1318;border-top:1px solid #1b2530">
+
+  <!-- COLORS -->
+  <div style="padding:14px 16px;border-top:1px solid #1b2530">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6b78;font-weight:700">Colour Overrides</div>
+      <button onClick="{{ data.h.resetColors }}" style="background:#141a20;border:1px solid #2b3947;color:#8a93a0;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer">Reset to brand</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df">
+        <input type="color" value="{{ data.bg }}" onInput="{{ data.h.bg }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Background
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df">
+        <input type="color" value="{{ data.text }}" onInput="{{ data.h.text }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Headline
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df">
+        <input type="color" value="{{ data.accent }}" onInput="{{ data.h.accent }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Accent
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df">
+        <input type="color" value="{{ data.pillText }}" onInput="{{ data.h.pillText }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Code text
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df">
+        <input type="color" value="{{ data.pillBg }}" onInput="{{ data.h.pillBg }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Code pill
+      </label>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid #1b2530">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#cdd6df;flex:1">
+        <input type="color" value="{{ data.ballColorInput }}" onInput="{{ data.h.ballColor }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Background overlay
+      </label>
+      <button onClick="{{ data.h.clearBallColor }}" style="background:#141a20;border:1px solid #2b3947;color:#8a93a0;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer">Original</button>
+    </div>
+  </div>
+
+  <!-- LOGO TOGGLE -->
+  <div style="padding:14px 16px;border-top:1px solid #1b2530;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:13px;color:#cdd6df;font-weight:600">Show SBR logo</div>
+    <button onClick="{{ data.h.toggleCovers }}" style="width:46px;height:26px;border-radius:999px;border:none;cursor:pointer;position:relative;transition:background .15s;background:{{ data.coversTrack }}">
+      <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;transform:{{ data.coversKnob }}"></span>
+    </button>
+  </div>
+
+  <!-- PHONE SCREEN (card 3 only) -->
+  <sc-if value="{{ showScreen }}" hint-placeholder-val="">
+    <div style="padding:14px 16px;border-top:1px solid #1b2530">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6b78;font-weight:700;margin-bottom:8px">Phone Screen</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:13px;color:#cdd6df;font-weight:600">Show arrow</div><button onClick="{{ data.h.toggleArrow }}" style="width:46px;height:26px;border-radius:999px;border:none;cursor:pointer;position:relative;transition:background .15s;background:{{ data.arrowTrack }}">
+      <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;transform:{{ data.arrowKnob }}"></span>
+    </button></div>
+      <sc-if value="{{ data.arrowOn }}" hint-placeholder-val="">
+        <div style="margin-bottom:12px"><label style="display:flex;align-items:center;gap:8px;font-size:11px;color:#cdd6df;margin-bottom:7px"><span style="width:10px">X</span><input type="range" min="-300" max="300" step="2" value="{{ data.arrowX }}" onInput="{{ data.h.setArrowX }}" style="flex:1;accent-color:#0063FF;cursor:pointer"/></label><label style="display:flex;align-items:center;gap:8px;font-size:11px;color:#cdd6df;margin-bottom:7px"><span style="width:10px">Y</span><input type="range" min="-300" max="300" step="2" value="{{ data.arrowY }}" onInput="{{ data.h.setArrowY }}" style="flex:1;accent-color:#0063FF;cursor:pointer"/></label><div style="display:flex;align-items:center;justify-content:space-between"><div style="font-size:11px;color:#cdd6df">Flip arrow vertically</div><button onClick="{{ data.h.toggleArrowFlipV }}" style="width:46px;height:26px;border-radius:999px;border:none;cursor:pointer;position:relative;transition:background .15s;background:{{ data.arrowFlipVTrack }}">
+      <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;transform:{{ data.arrowFlipVKnob }}"></span>
+    </button></div></div>
+      </sc-if>
+      
+      
+      <div style="font-size:11px;color:#8a93a0;margin-bottom:10px">The uploaded screenshot sits behind the phone frame and is saved to the current brand.</div>
+      <div style="display:flex;gap:8px">
+        <label style="flex:1;text-align:center;background:#1b2530;border:1px solid #2b3947;color:#cdd6df;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">
+          Upload screen
+          <input type="file" accept="image/*" onChange="{{ data.h.uploadScreen }}" style="display:none"/>
+        </label>
+        <button onClick="{{ data.h.clearScreen }}" style="background:#141a20;border:1px solid #2b3947;color:#8a93a0;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+</body>
+</html>

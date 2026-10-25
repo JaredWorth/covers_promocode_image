@@ -120,8 +120,9 @@ function SingleOffer({ v, g }: { v: View; g: FormatGeo }) {
 }
 
 function CodeZone({ v, g }: { v: View; g: FormatGeo }) {
+  if (v.site.pill === 'band') return <BandCode v={v} g={g} />;
   // SI: plain white pill without border or ring; the engine centres the code on its ink.
-  const plain = v.site.plainPill;
+  const plain = v.site.pill === 'plain';
   return (
     <div data-zone="code" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center' }}>
       <div data-unit="1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transformOrigin: 'center' }}>
@@ -134,6 +135,21 @@ function CodeZone({ v, g }: { v: View; g: FormatGeo }) {
           <span data-code="1" style={plain
             ? { fontFamily: v.site.displayFont, fontWeight: 900, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, transform: 'none' }
             : { fontFamily: v.site.displayFont, fontWeight: 700, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, position: 'relative', top: '0.185em', transform: 'none' }}>{v.code}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** SBR: white label band over a brand-gradient code band; the engine sizes both from the unit's width. */
+function BandCode({ v, g }: { v: View; g: FormatGeo }) {
+  const barlow = v.site.labelFont;
+  return (
+    <div data-zone="code" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center' }}>
+      <div data-unit="1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', transformOrigin: 'center', marginTop: v.lblMT, width: 'fit-content', maxWidth: v.pillMaxW, borderRadius: 10, overflow: 'hidden', boxShadow: '0 8px 19px rgba(0,0,0,.25)' }}>
+        <div data-role="lbl" style={{ fontFamily: barlow, fontWeight: 700, fontSize: g.labelSize, color: '#1b1b1b', background: '#ffffff', textAlign: 'center', padding: '14px 56px', textTransform: 'uppercase', whiteSpace: 'nowrap', letterSpacing: '.01em', lineHeight: 1.1 }}>{v.promoLabel}</div>
+        <div data-pill="1" style={{ padding: '26px 64px', background: v.pillGrad, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span data-code="1" style={{ fontFamily: barlow, fontWeight: 800, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 1 }}>{v.code}</span>
         </div>
       </div>
     </div>
@@ -190,7 +206,7 @@ function Phone({ v }: { v: View }) {
       {v.screen ? (
         <div style={{ ...screenBox, overflow: 'hidden', backgroundColor: '#fff', backgroundImage: `url("${v.screen}")`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }} />
       ) : (
-        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: v.site.labelFont, textAlign: 'center', padding: '0 24px' }}>
+        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: v.site.uiFont, textAlign: 'center', padding: '0 24px' }}>
           <div style={{ fontSize: 34 }}>＋</div>
           <div style={{ fontSize: 18, fontWeight: 600 }}>Upload a screen<br />for this brand</div>
         </div>
@@ -205,8 +221,17 @@ function Phone({ v }: { v: View }) {
   );
 }
 
+const CURVED_ARROW = 'M213.533 107.494L187.089 69.0626C186.212 67.7885 184.866 66.9149 183.345 66.6338C181.824 66.3528 180.254 66.6874 178.98 67.5641L140.548 94.0077C139.274 94.8844 138.4 96.2313 138.119 97.7521C137.838 99.2729 138.173 100.843 139.05 102.117C139.926 103.391 141.273 104.265 142.794 104.546C144.315 104.827 145.885 104.492 147.159 103.616L173.941 85.1877L169.691 107.763C167.388 120.24 161.437 131.754 152.59 140.849C143.743 149.944 132.398 156.21 119.989 158.856C107.581 161.502 94.6658 160.409 82.8785 155.715C71.0912 151.02 60.9608 142.936 53.7687 132.483C52.892 131.209 51.5451 130.335 50.0243 130.054C48.5035 129.773 46.9333 130.108 45.6593 130.985C44.3852 131.861 43.5115 133.208 43.2305 134.729C42.9495 136.25 43.2841 137.82 44.1608 139.094C52.6595 151.446 64.6302 161.001 78.5591 166.549C92.488 172.098 107.749 173.391 122.413 170.266C137.078 167.141 150.486 159.738 160.942 148.992C171.398 138.247 178.433 124.642 181.158 109.898L185.427 87.221L203.925 114.105C204.802 115.379 206.148 116.253 207.669 116.534C209.19 116.815 210.76 116.48 212.034 115.604C213.308 114.727 214.182 113.38 214.463 111.859C214.744 110.338 214.409 108.768 213.533 107.494Z';
+
 function Arrow({ v }: { v: View }) {
   if (!v.overlayOn) return null;
+  if (v.site.arrow === 'curved') {
+    return (
+      <svg style={{ position: 'absolute', left: 624, top: 416, width: 180, height: 120, zIndex: 9999, transform: v.arrowTransform, transformOrigin: 'center', filter: 'drop-shadow(0 12px 8px rgba(0,0,0,.45))' }} viewBox="38 62 182 116" fill="none">
+        <path d={CURVED_ARROW} fill={v.accent} />
+      </svg>
+    );
+  }
   return (
     <svg style={{ position: 'absolute', left: 632, top: 432, width: 165, height: 88, zIndex: 9999, transform: v.arrowTransform, transformOrigin: 'center' }} viewBox="0 0 165 88" fill="none">
       <path d="M0 74.5161V63.6344H73.7786C89.5714 63.6344 95.7 61.0323 106.779 49.914L146.143 11.1183H77.0786V0H165V88H153.921V18.9247L114.086 58.1936C98.7643 73.5699 89.8071 74.5161 74.25 74.5161H0Z" fill={v.accent} />
@@ -223,8 +248,10 @@ export const PromoCanvas = forwardRef<HTMLDivElement, { fmt: TemplateKey; v: Vie
   const balls = v.site.decor === 'balls';
   const bottomBall = balls && <Ball geo={g.ballBottom} url={v.ballBottomUrl} size={v.ballBottomSize} transform={v.ballBottomTransform} />;
   return (
-    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: v.site.labelFont }}>
-      {balls ? (
+    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: v.site.uiFont }}>
+      {v.site.decor === 'photo' ? (
+        <div style={{ position: 'absolute', zIndex: 0, inset: -6, backgroundImage: `url("${v.photoUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+      ) : balls ? (
         <>
           <img src={asset('assets/comm-bg-wave.svg')} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', WebkitMaskImage: WAVE_MASK, maskImage: WAVE_MASK }} />
           <Ball geo={g.ballTop} url={v.ballTopUrl} size={v.ballTopSize} transform={v.ballTopTransform} />

@@ -12,9 +12,13 @@ export const CATEGORIES: { id: CategoryId; name: string }[] = [
 /** Casino and Sweepstakes use the single "offer text" layout; the others use the structured zone grid. */
 export const isSingleCat = (cat: CategoryId) => cat === 'casino' || cat === 'sweepstakes';
 
-const bookCache: Partial<Record<CategoryId, Record<string, Brand>>> = {};
-export function booksFor(cat: CategoryId): Record<string, Brand> {
-  const hit = bookCache[cat];
+/** A brand as this site sees it: the shared record plus any site-specific fields. */
+export const brandFor = (site: Site, key: string): Brand | undefined =>
+  BRANDS[key] && (site.brandOverrides?.[key] ? { ...BRANDS[key], ...site.brandOverrides[key] } : BRANDS[key]);
+
+const bookCache: Record<string, Record<string, Brand>> = {};
+export function booksFor(site: Site, cat: CategoryId): Record<string, Brand> {
+  const ck = site.id + '|' + cat, hit = bookCache[ck];
   if (hit) return hit;
   const keys =
     cat === 'predictions' ? PREDICTION_KEYS :
@@ -23,12 +27,12 @@ export function booksFor(cat: CategoryId): Record<string, Brand> {
     Object.keys(BRANDS).filter(k => !PREDICTION_KEYS.includes(k) && !CASINO_KEYS.includes(k) && !SWEEP_KEYS.includes(k));
   // Keep the prototype's source order (dropdowns for Casino/Sweeps sort by name separately).
   const out: Record<string, Brand> = {};
-  Object.keys(BRANDS).forEach(k => { if (keys.includes(k)) out[k] = BRANDS[k]; });
-  return (bookCache[cat] = out);
+  Object.keys(BRANDS).forEach(k => { if (keys.includes(k)) out[k] = brandFor(site, k)!; });
+  return (bookCache[ck] = out);
 }
 
-export function bookList(cat: CategoryId) {
-  const books = booksFor(cat);
+export function bookList(site: Site, cat: CategoryId) {
+  const books = booksFor(site, cat);
   const list = Object.keys(books).map(id => ({ id, name: books[id].name }));
   if (isSingleCat(cat)) list.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
   return list;
@@ -64,15 +68,19 @@ export const DEFAULT_OFFER = 'FIRST BET OFFER';
 export const DEFAULT_TCS = '21+. New customers only. T&Cs apply.';
 export const SINGLE_DEFAULTS = { ballTop: 'cherries', ballBottom: 'dice', amount: 'Up to $1,500 + 200 free spins' };
 
-/** A brand's offer defaults, with the site's promo code where the site overrides brand codes. */
-export function brandDefaults(site: Site, b: Brand | undefined): Partial<OfferDefaults> {
-  const d = { ...(b?.defaults || {}) };
-  if (site.forceCode && d.code != null) d.code = site.code;
+/** Rebranded sites swap the Covers house codes (COVERS, COVERS350…) for their own; brand codes like MAX60 stay. */
+const siteCode = (site: Site, code: string) => (site.rebrandCodes && /^COVERS/.test(code) ? site.code : code);
+
+/** A brand's offer defaults, with codes translated for this site. */
+export function brandDefaults(site: Site, key: string): Partial<OfferDefaults> {
+  const d = { ...(BRANDS[key]?.defaults || {}) };
+  if (d.code != null) d.code = siteCode(site, d.code);
   return d;
 }
 
 /** The promo code a brand starts with on this site. */
-export const brandCode = (site: Site, b: Brand | undefined) => (site.forceCode ? site.code : b?.code || site.code);
+export const brandCode = (site: Site, key: string) =>
+  site.codeOverrides?.[key] ?? siteCode(site, BRANDS[key]?.code || site.code);
 
 /** "Start from a format" buttons (structured categories). */
 export const FORMATS = [
@@ -87,7 +95,7 @@ export function baseTemplate(over: Partial<TemplateState> = {}): TemplateState {
     brandText: {}, screenByBrand: {},
     promoLabel: 'USE PROMO CODE:', code: 'COVERS', tcs: 'T&Cs apply',
     eyebrow: '', line1: '$1,500', line2: '', sub: 'FIRST BET OFFER', stateNote: '', heroAccentOn: false,
-    showPromo: true, showOverlay: true,
+    showPromo: true, showOverlay: true, showArrow: true,
     showCovers: false, ballTop: 'football', ballBottom: 'basketball', sport: 'generic', textLogo: false,
     arrowX: 0, arrowY: 0, arrowFlipV: false,
     ballTopDX: 0, ballTopDY: 0, ballBottomDX: 0, ballBottomDY: 0,

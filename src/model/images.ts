@@ -126,3 +126,36 @@ export function sportBackground(src: string, bg: string, accent: string, light: 
   }
   return src;
 }
+
+// ---- SBR background photos ----
+
+const photoCache: Record<string, string | null> = {};
+/**
+ * Tint an SBR background photo: trim its 6px edge, apply the colour as a
+ * "color" blend, multiply it in at 55%, then add an optional black overlay.
+ * Returns the original image until the tinted one is ready.
+ */
+export function tintPhoto(src: string, color: string, dark: number): string {
+  const key = color + '|' + src + '|' + (dark || 0);
+  const hit = photoCache[key];
+  if (hit) return hit;
+  if (hit === undefined) {
+    photoCache[key] = null;
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        const x = c.getContext('2d')!;
+        x.drawImage(img, 6, 6, w - 12, h - 12, 0, 0, w, h);
+        x.globalCompositeOperation = 'color'; x.fillStyle = color; x.fillRect(0, 0, w, h);
+        x.globalCompositeOperation = 'multiply'; x.globalAlpha = 0.55; x.fillRect(0, 0, w, h);
+        if (dark) { x.globalCompositeOperation = 'source-over'; x.globalAlpha = dark; x.fillStyle = '#000'; x.fillRect(0, 0, w, h); }
+        c.toBlob(b => { photoCache[key] = b ? URL.createObjectURL(b) : src; bump(); }, 'image/png');
+      } catch { photoCache[key] = src; bump(); }
+    };
+    img.onerror = () => { photoCache[key] = src; bump(); };
+    img.src = src;
+  }
+  return src;
+}

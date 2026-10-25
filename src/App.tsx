@@ -7,10 +7,10 @@ import { PromoCanvas } from './components/PromoCanvas';
 import { SharedControls } from './components/SharedControls';
 import { LayoutEngine } from './layout/engine';
 import { exportZip } from './model/export';
-import { logoAspect, recolorBall, sportBackground, useImageCache } from './model/images';
+import { logoAspect, recolorBall, sportBackground, tintPhoto, useImageCache } from './model/images';
 import { useBuilder } from './model/store';
 import { computeView } from './model/view';
-import { SPORTS, type Site } from './site';
+import { SBR_BACKGROUNDS, SPORTS, type Site } from './site';
 
 const CARDS: { key: TemplateKey; title: string; chip: string; size: string; preview: { w: number; h: number; scale: number } }[] = [
   { key: 't1', title: 'Square Post', chip: 'Square', size: '1080 × 1080', preview: { w: 420, h: 420, scale: 420 / 1080 } },
@@ -30,7 +30,7 @@ export default function App({ site }: { site: Site }) {
   const engine = useRef<LayoutEngine>();
   engine.current ||= new LayoutEngine(site, () => runLayout.current());
 
-  const ctx = { site, cat: st.cat, showZones: st.showZones, aspect: logoAspect, recolor: recolorBall, sportBg: sportBackground };
+  const ctx = { site, cat: st.cat, showZones: st.showZones, aspect: logoAspect, recolor: recolorBall, sportBg: sportBackground, tintPhoto };
   const views = { t1: computeView('t1', st.t1, ctx), t2: computeView('t2', st.t2, ctx), t3: computeView('t3', st.t3, ctx) };
 
   // Fit text and place zones on the real DOM after every render.
@@ -39,9 +39,16 @@ export default function App({ site }: { site: Site }) {
     setFitWarn(prev => (prev === w ? prev : w));
   };
   useLayoutEffect(() => runLayout.current());
-  useLayoutEffect(() => { document.fonts?.ready.then(() => runLayout.current()); }, []);
+  // Re-fit once web fonts arrive (late-loading faces such as Barlow or Factoria change every measurement).
+  useLayoutEffect(() => {
+    const re = () => runLayout.current();
+    document.fonts?.ready.then(re);
+    document.fonts?.addEventListener('loadingdone', re);
+    const timers = [300, 1000, 2500].map(ms => setTimeout(re, ms));
+    return () => { document.fonts?.removeEventListener('loadingdone', re); timers.forEach(clearTimeout); };
+  }, []);
 
-  const books = booksFor(st.cat);
+  const books = booksFor(site, st.cat);
   const cards = CARDS.filter(c => site.templates.includes(c.key));
   const anySel = site.templates.some(k => exportSel[k]);
   const doExport = async () => {
@@ -55,20 +62,20 @@ export default function App({ site }: { site: Site }) {
   };
   const catName = CATEGORIES.find(c => c.id === st.cat)!.name;
   const balls = ballsFor(st.cat);
-  // SI swaps the Ball A/B pickers for a single sport background picker.
-  const decorOptions = site.decor === 'sport' ? SPORTS.map(x => ({ id: x.id, name: x.name })) : Object.keys(balls).map(id => ({ id, name: balls[id].name }));
+  // SI and SBR swap the Ball A/B pickers for a single background picker.
+  const decorOptions = site.decor === 'sport' ? SPORTS : site.decor === 'photo' ? SBR_BACKGROUNDS : Object.keys(balls).map(id => ({ id, name: balls[id].name }));
 
   return (
     <div className="app">
       <header style={{ padding: '26px 30px 18px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <img src={asset(site.headerIcon)} style={{ width: 30, height: 30 }} alt="" />
-            <h1 style={{ margin: 0, fontWeight: 700, fontSize: 25, color: '#fff', letterSpacing: site.id === 'si' ? '.4px' : '-.01em' }}>Promo Template Builder</h1>
+            <img src={asset(site.header.icon)} style={site.header.iconStyle} alt="" />
+            <h1 style={{ margin: 0, fontFamily: site.header.titleFont, fontWeight: 700, fontSize: 25, color: '#fff', letterSpacing: site.header.titleSpacing }}>Promo Template Builder</h1>
           </div>
           <div style={{ fontSize: 13, color: 'var(--hint)', marginTop: 7, maxWidth: 680 }}>{site.intro}</div>
         </div>
-        <div style={{ fontSize: 11, color: 'var(--tag)', letterSpacing: '.04em' }}>{site.label} &nbsp;×&nbsp; {catName.toUpperCase()} PROMO</div>
+        <div style={{ fontSize: 11, color: 'var(--tag)', letterSpacing: '.04em', fontFamily: site.monoFont }}>{site.label} &nbsp;×&nbsp; {catName.toUpperCase()} PROMO</div>
       </header>
 
       <nav style={{ display: 'flex', gap: 8, padding: '0 30px 10px', flexWrap: 'wrap' }} aria-label="Category">
@@ -78,7 +85,7 @@ export default function App({ site }: { site: Site }) {
       </nav>
 
       <div style={{ padding: '8px 30px 4px' }}>
-        <SharedControls site={site} s={st.t1} v={views.t1} a={a} books={bookList(st.cat)} balls={decorOptions} showZones={st.showZones} fitWarn={fitWarn} />
+        <SharedControls site={site} s={st.t1} v={views.t1} a={a} books={bookList(site, st.cat)} balls={decorOptions} showZones={st.showZones} fitWarn={fitWarn} />
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 30px 0', flexWrap: 'wrap' }}>
@@ -105,7 +112,7 @@ export default function App({ site }: { site: Site }) {
           <section key={key} className="card" aria-label={title}>
             <div style={{ padding: '15px 16px', borderBottom: '1px solid var(--border)' }}>
               <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{title}</div>
-              <div style={{ fontSize: 11, color: 'var(--dim)', marginTop: 2 }}>{size}</div>
+              <div style={{ fontSize: 11, color: 'var(--dim)', marginTop: 2, fontFamily: site.monoFont }}>{size}</div>
             </div>
             <div style={{ padding: 16, background: 'var(--preview)', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: key === 't1' ? undefined : 269 }}>
               <div style={{ width: preview.w, height: preview.h, overflow: 'hidden', borderRadius: 8, position: 'relative', boxShadow: '0 6px 24px rgba(0,0,0,.5)' }}>

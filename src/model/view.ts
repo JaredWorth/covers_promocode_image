@@ -1,7 +1,7 @@
 import { asset } from '../data/assets';
 import { ballsFor, booksFor, DEFAULT_TCS, isSingleCat } from '../data/catalog';
 import type { Brand, CategoryId, TemplateKey, TemplateState } from '../data/types';
-import { SPORTS, type Site } from '../site';
+import { SBR_BACKGROUNDS, SPORTS, type Site } from '../site';
 
 // Values the prototype exposed in its design-tool "Tweaks" panel, fixed at
 // the defaults the design shipped with.
@@ -27,7 +27,16 @@ export interface ViewCtx {
   recolor: (src: string, color: string | null) => string;
   /** SI: brand-recoloured sport background URL. */
   sportBg: (src: string, bg: string, accent: string, light: boolean) => string;
+  /** SBR: tinted background photo URL. */
+  tintPhoto: (src: string, color: string, dark: number) => string;
 }
+
+const hex6 = (v: string | null | undefined) => (/^#[0-9a-f]{6}$/i.test(v || '') ? v! : null);
+/** WCAG relative luminance of a #rrggbb colour. */
+const luminance = (h: string) => {
+  const c = [1, 3, 5].map(i => { const v = parseInt(h.substr(i, 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
 
 const BALL_XFORM: Record<TemplateKey, { top: string; bottom: string }> = {
   t1: { top: 'rotate(-9deg)', bottom: '' },
@@ -43,7 +52,7 @@ export type View = ReturnType<typeof computeView>;
 /** Everything a template and its controls render, derived from state + brand. */
 export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
   const single = isSingleCat(ctx.cat);
-  const books = booksFor(ctx.cat), balls = ballsFor(ctx.cat);
+  const books = booksFor(ctx.site, ctx.cat), balls = ballsFor(ctx.cat);
   const b0: Brand = books[s.book] || books.betmgm || Object.values(books)[0];
   const accent = s.accentC || b0.accent;
 
@@ -62,9 +71,18 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
 
   // Pill colours. Covers: a light tint of the accent, and light-background brands keep their
   // own dark pill. SI: always a white pill.
-  const own = !!b0.darkWord, plain = ctx.site.plainPill;
+  const own = !!b0.darkWord, plain = ctx.site.pill === 'plain', band = ctx.site.pill === 'band';
   const pillFill = plain ? '#ffffff' : s.pillBgC || (own ? b0.pillBg : `color-mix(in srgb, ${accent} 30%, #ffffff)`);
   const pillLabel = own ? (b0.promoLabelColor || (plain ? b0.text : pillFill)) : `color-mix(in srgb, ${accent} 50%, #ffffff)`;
+
+  // SBR: one brand colour drives the background tint and the code band; code text picks
+  // white or near-black by contrast.
+  const photo = ctx.site.decor === 'photo';
+  const brandC = hex6(s.bgC) || b0.brand || (hex6(b0.bg) && luminance(b0.bg) > 0.02 ? b0.bg : hex6(b0.accent) || '#0078FF');
+  const bandFill = hex6(s.pillBgC) || brandC, bl = luminance(bandFill);
+  const bandText = 1.05 / (bl + 0.05) >= (bl + 0.05) / 0.054 ? '#ffffff' : '#0b0f0d';
+  const bgPhoto = SBR_BACKGROUNDS.find(x => x.id === s.ballTop) || SBR_BACKGROUNDS[0];
+  const overlay = hex6(s.ballColorC) || hex6(s.bgC);
 
   // Logo box sizing from the logo's aspect ratio.
   const logoFile = s.logoOv || asset(b0.logo);
@@ -132,8 +150,9 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
 
     // Promo code
     showPromo: s.showPromo, promoLabel: s.promoLabel, code: s.code,
-    promoLabelC: pillLabel, pillBg: pillFill,
-    pillText: s.pillTextC || (own && !plain ? b0.pillText : '#0c0a06'),
+    promoLabelC: pillLabel, pillBg: band ? bandFill : pillFill,
+    pillGrad: `linear-gradient(90deg, color-mix(in srgb, ${bandFill} 72%, #000000) 0%, ${bandFill} 50%, color-mix(in srgb, ${bandFill} 72%, #000000) 100%)`,
+    pillText: s.pillTextC || (band ? bandText : own && !plain ? b0.pillText : '#0c0a06'),
     pillBorder: own ? b0.bg : '#ffffff',
     pillRing: `color-mix(in srgb, ${pillFill} 25%, transparent)`,
 
@@ -144,8 +163,9 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
     ballBottomSize: sizeFor(ballBottom, s.ballBottomOv),
     ballTopTransform: `translate(${s.ballTopDX || 0}px, ${s.ballTopDY || 0}px) ${BALL_XFORM[key].top}`,
     ballBottomTransform: `translate(${s.ballBottomDX || 0}px, ${s.ballBottomDY || 0}px) ${BALL_XFORM[key].bottom}`,
-    ballColorInput: s.ballColorC || '#FD5000',
-    bgInput: s.bgC || (/^#[0-9a-f]{6}$/i.test(b0.bg) ? b0.bg : '#000000'),
+    ballColorInput: s.ballColorC || ctx.site.theme['--accent'],
+    bgInput: s.bgC || (photo ? b0.brand || hex6(b0.bg) || hex6(b0.accent) || '#000000' : hex6(b0.bg) || '#000000'),
+    photoUrl: photo ? ctx.tintPhoto(asset(bgPhoto.src), overlay || b0.tint || brandC, overlay ? 0 : b0.dark || 0) : '',
 
     // Logo
     logoSrc: textLogo ? '' : logoFile, logoW: lg.w, logoH: lg.h, logoBoxH: lg.box,
@@ -157,7 +177,7 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
 
     // Banner + App Screen
     screen,
-    overlayOn: s.showPromo && s.showOverlay !== false,
+    overlayOn: s.showPromo && (ctx.site.arrow === 'curved' ? s.showArrow !== false : s.showOverlay !== false),
     arrowTransform: `translate(${TWEAKS.arrowX + (s.arrowX || 0)}px, ${TWEAKS.arrowY + (s.arrowY || 0)}px) scale(1, ${TWEAKS.arrowFlipV !== !!s.arrowFlipV ? -1 : 1})`,
     phoneCode: {
       left: TWEAKS.codeX + '%', top: TWEAKS.codeY + '%', font: TWEAKS.codeSize + 'px',

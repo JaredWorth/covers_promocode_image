@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:'Inter',sans-serif;background:#0e1318;border:1px solid #1b2530;border-radius:14px;padding:18px 20px">
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px">
+    <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5f6b78;font-weight:700;color:#0063FF">All graphics</div>
+    <div style="font-size:12px;color:#8a93a0">Edits here apply to all three graphics</div>
+  </div>
+  <sc-if value="{{ data.fitWarn }}" hint-placeholder-val="">
+    <div style="background:#2a0f10;border:1px solid #d83a3a;color:#ff8a8a;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:14px">Text can't fit at minimum size: {{ data.fitWarn }}. Shorten the copy.</div>
+  </sc-if>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Brand</label>
+        <select value="{{ data.bookId }}" onChange="{{ data.h.book }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif">
+          <sc-for list="{{ books }}" as="bk" hint-placeholder-count="6"><option value="{{ bk.id }}">{{ bk.name }}</option></sc-for>
+        </select>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div style="flex:1;min-width:0">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Logo</label>
+          <div style="display:flex;gap:6px">
+            <label style="flex:1;text-align:center;background:#1b2530;border:1px solid #2b3947;color:#cdd6df;border-radius:8px;padding:9px 10px;font-size:12px;font-weight:600;cursor:pointer;box-sizing:border-box">Upload logo<input type="file" accept="image/*" onChange="{{ data.h.uploadLogo }}" style="display:none"/></label>
+            <button onClick="{{ data.h.clearLogo }}" style="background:#141a20;border:1px solid #2b3947;color:#8a93a0;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0">
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Main colour</label>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input type="color" value="{{ data.bgInput }}" onInput="{{ data.h.bg }}" style="width:100%;height:37px;border:1px solid #283340;background:#10151b;border-radius:8px;cursor:pointer;padding:3px;box-sizing:border-box"/>
+            <button onClick="{{ data.h.clearBg }}" style="background:#141a20;border:1px solid #2b3947;color:#8a93a0;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Background</label>
+        <select value="{{ data.ballTop }}" onChange="{{ data.h.ballTop }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif">
+          <sc-for list="{{ balls }}" as="bl" hint-placeholder-count="3"><option value="{{ bl.id }}">{{ bl.name }}</option></sc-for>
+        </select>
+      </div>
+      <sc-if value="{{ data.hasHeroAccent }}" hint-placeholder-val="">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <input type="checkbox" checked="{{ data.heroAccentOn }}" onChange="{{ data.h.heroAccent }}" style="width:17px;height:17px;accent-color:#0063FF;cursor:pointer;margin:0"/>
+          <span style="font-size:13px;color:#cdd6df;font-weight:600">Brand accent on hero text</span>
+        </label>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ data.structured }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Start from a format</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ data.formats }}" as="fm" hint-placeholder-count="3"><button onClick="{{ fm.pick }}" style="background:#10151b;color:#cdd6df;border:1px solid #283340;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif">{{ fm.name }}</button></sc-for></div>
+        </div>
+        <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Eyebrow (optional)</label><input type="text" value="{{ data.eyebrow }}" onChange="{{ data.h.eyebrow }}" onInput="{{ data.h.eyebrow }}" disabled="{{ data.eyeLock }}" placeholder="{{ data.eyePh }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;text-transform:uppercase"/></div>
+        <div style="display:flex;gap:10px"><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Headline line 1</label><input type="text" value="{{ data.line1 }}" onChange="{{ data.h.line1 }}" onInput="{{ data.h.line1 }}" placeholder="e.g. BET $5" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;text-transform:uppercase"/></div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Headline line 2 (optional)</label><input type="text" value="{{ data.line2 }}" onChange="{{ data.h.line2 }}" onInput="{{ data.h.line2 }}" placeholder="e.g. GET $150" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;text-transform:uppercase"/></div></div>
+        <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Sub line (optional)</label><input type="text" value="{{ data.sub }}" onChange="{{ data.h.sub }}" onInput="{{ data.h.sub }}" disabled="{{ data.subLock }}" placeholder="{{ data.subPh }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;text-transform:uppercase"/></div>
+        <div style="font-size:11px;line-height:1.4;color:#6b7682">Both headline lines always share one size. Sub line is half that size. Leave a field blank to hide it.</div>
+      </sc-if>
+      <sc-if value="{{ data.single }}" hint-placeholder-val="">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">{{ data.hlLabel }}</label>
+          <input type="text" value="{{ data.amount }}" onChange="{{ data.h.amount }}" onInput="{{ data.h.amount }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/>
+        </div>
+      </sc-if>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" checked="{{ data.showPromo }}" onChange="{{ data.h.togglePromo }}" style="width:17px;height:17px;accent-color:#0063FF;cursor:pointer;margin:0"/>
+        <span style="font-size:13px;color:#cdd6df;font-weight:600">Use promo code</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <input type="checkbox" checked="{{ data.showZones }}" onChange="{{ data.h.toggleZones }}" style="width:17px;height:17px;accent-color:#0063FF;cursor:pointer;margin:0"/>
+        <span style="font-size:13px;color:#cdd6df;font-weight:600">Show zones <span style="color:#6b7682;font-weight:400">(debug · not exported)</span></span>
+      </label>
+      <sc-if value="{{ data.showPromo }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:10px">
+          <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Promo label</label><input type="text" value="{{ data.promoLabel }}" onChange="{{ data.h.promoLabel }}" onInput="{{ data.h.promoLabel }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div>
+          <div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">Promo code</label><input type="text" value="{{ data.code }}" onChange="{{ data.h.code }}" onInput="{{ data.h.code }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.04em"/></div>
+        </div>
+      </sc-if>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-if value="{{ data.tcsLocked }}" hint-placeholder-val="{{ true }}">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">T&amp;Cs (set by brand · read-only)</label>
+          <textarea readonly="{{ true }}" value="{{ data.lockedTcs }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;min-height:96px;height:96px;resize:none;line-height:1.45;display:block;color:#8a93a0;cursor:not-allowed"></textarea>
+        </div>
+        <div><div style="flex:1;min-width:0"><label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">State note (optional, appended to T&Cs)</label><input type="text" value="{{ data.stateNote }}" onChange="{{ data.h.stateNote }}" onInput="{{ data.h.stateNote }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif"/></div></div>
+      </sc-if>
+      <sc-if value="{{ data.single }}" hint-placeholder-val="">
+        <div>
+          <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8a93a0;font-weight:600;margin-bottom:6px;display:block">T&amp;Cs text</label>
+          <textarea value="{{ data.tcs }}" onChange="{{ data.h.tcs }}" onInput="{{ data.h.tcs }}" style="width:100%;box-sizing:border-box;background:#10151b;border:1px solid #283340;border-radius:8px;color:#e8edf2;padding:9px 11px;font-size:13px;font-family:'Inter',sans-serif;min-height:120px;height:150px;resize:vertical;line-height:1.45;display:block"></textarea>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

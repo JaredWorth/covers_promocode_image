@@ -64,7 +64,14 @@ export function SharedControls({ site, s, v, a, books, balls, showZones, fitWarn
               </div>
             </div>
           </div>
-          {site.decor === 'sport' ? (
+          {site.decor === 'photo' ? (
+            <div>
+              <label className="lbl" htmlFor="background">Background</label>
+              <select id="background" className="field" value={s.ballTop} onChange={text('ballTop')}>
+                {balls.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+              </select>
+            </div>
+          ) : site.decor === 'sport' ? (
             <>
               <div>
                 <label className="lbl" htmlFor="sport">Background</label>

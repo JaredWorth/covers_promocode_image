@@ -1,6 +1,6 @@
-import { loadIndustry } from './fonts';
+import { loadOptionalFont } from './fonts';
 import { mount } from './mount';
 import { SI } from './site';
 
-loadIndustry();
+loadOptionalFont('Industry');
 mount(SI);

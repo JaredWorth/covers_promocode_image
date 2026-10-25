@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { BRANDS } from '../data/brands';
-import { baseTemplate, booksFor, brandCode, brandDefaults, DEFAULT_AMOUNT, DEFAULT_OFFER, FORMATS, isSingleCat, SINGLE_DEFAULTS } from '../data/catalog';
+import { baseTemplate, booksFor, brandCode, brandDefaults, brandFor, DEFAULT_AMOUNT, DEFAULT_OFFER, FORMATS, isSingleCat, SINGLE_DEFAULTS } from '../data/catalog';
 import { TEMPLATE_KEYS, type CategoryId, type TemplateKey, type Templates, type TemplateState } from '../data/types';
 import type { Site } from '../site';
 
@@ -41,8 +40,10 @@ export function useBuilder(site: Site) {
       const saved = { ...s.saved, [s.cat]: { t1: s.t1, t2: s.t2, t3: s.t3 } };
       let next = saved[id];
       if (!next) {
-        const first = Object.keys(booksFor(id))[0];
-        const over: Partial<TemplateState> = { ...site.defaults, ...(isSingleCat(id) ? SINGLE_DEFAULTS : brandDefaults(site, BRANDS[first])) };
+        const first = Object.keys(booksFor(site, id))[0];
+        // SBR: Prediction Markets default to the stars photo; a brand's own photo wins.
+        const photo = site.decor === 'photo' ? (brandFor(site, first)?.bgImg || (id === 'predictions' ? 'stars' : undefined)) : undefined;
+        const over: Partial<TemplateState> = { ...site.defaults, ...(photo ? { ballTop: photo } : {}), ...(isSingleCat(id) ? SINGLE_DEFAULTS : brandDefaults(site, first)) };
         next = {
           t1: baseTemplate({ ...over, showCovers: true, book: first }),
           t2: baseTemplate({ ...over, book: first }),
@@ -54,15 +55,16 @@ export function useBuilder(site: Site) {
 
     /** Brand applies to all three; each template remembers its offer text per brand. */
     changeBook: (book: string) => setSt(s => {
-      const single = isSingleCat(s.cat), b = BRANDS[book];
+      const single = isSingleCat(s.cat), photo = site.decor === 'photo' ? brandFor(site, book)?.bgImg : undefined;
       return {
         ...s, ...each(s, t => {
           const brandText = { ...t.brandText, [t.book]: { amount: t.amount, offer: t.offer } };
           const saved = brandText[book] || {};
           return {
             book,
-            code: single ? t.code : brandCode(site, b),
-            ...(single ? {} : brandDefaults(site, b)),
+            code: single ? t.code : brandCode(site, book),
+            ...(single ? {} : brandDefaults(site, book)),
+            ...(photo ? { ballTop: photo } : {}),
             amount: saved.amount ?? DEFAULT_AMOUNT,
             offer: saved.offer ?? DEFAULT_OFFER,
             brandText,
@@ -92,6 +94,7 @@ export function useBuilder(site: Site) {
       const m = { ...s[key].screenByBrand }; delete m[s[key].book];
       return { ...s, [key]: { ...s[key], screenByBrand: m } };
     }),
+    toggleArrow: (key: TemplateKey) => setSt(s => ({ ...s, [key]: { ...s[key], showArrow: s[key].showArrow === false } })),
     toggleOverlay: () => setSt(s => ({ ...s, t3: { ...s.t3, showOverlay: !s.t3.showOverlay } })),
     toggleArrowFlipV: (key: TemplateKey) => setSt(s => ({ ...s, [key]: { ...s[key], arrowFlipV: !s[key].arrowFlipV } })),
     resetArrow: () => setCard('t3', { arrowX: 0, arrowY: 0, arrowFlipV: false }),
