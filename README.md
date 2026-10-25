@@ -29,6 +29,10 @@ Everything that differs between the sites is in `src/site.ts`. On rebranded site
 
 `/tools/` (from `project-tools/Editor Tools.dc.html`) is the entry point for editors. They pick Covers, Sports Illustrated or Sportsbook Review; the pick is remembered in the browser, and keys 1/2/3 switch it. The page then links to that brand's tools: the Logo Generator, the matching Promo Code Image Editor on this site, and the Mobile Screenshot Generator. Links are set in `src/tools/Tools.tsx`. The guide links and the "Request on Slack" link are still placeholders (`#`).
 
+### Favicon
+
+All four pages use the Legend swan mark (`src/assets/icons/`): `favicon.svg`, which turns white when the browser is in dark mode, plus `favicon-32.png` and a 180 px `apple-touch-icon.png` on white for browsers and home screens that don't take SVG. If the SVG changes, re-render the PNGs from it. The standalone builds inline all three.
+
 ## Running it
 
 ```bash
