@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:'Industry',sans-serif;background:#141414;border-top:1px solid #262626">
+
+  <!-- COLORS -->
+  <div style="padding:14px 16px;border-top:1px solid #262626">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#808080;font-weight:700">Colour Overrides</div>
+      <button onClick="{{ data.h.resetColors }}" style="background:#1a1a1a;border:1px solid #383838;color:#9a9a9a;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer">Reset to brand</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#d6d6d6">
+        <input type="color" value="{{ data.bg }}" onInput="{{ data.h.bg }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Background
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#d6d6d6">
+        <input type="color" value="{{ data.text }}" onInput="{{ data.h.text }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Headline
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#d6d6d6">
+        <input type="color" value="{{ data.accent }}" onInput="{{ data.h.accent }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Accent
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#d6d6d6">
+        <input type="color" value="{{ data.pillText }}" onInput="{{ data.h.pillText }}" style="width:30px;height:30px;border:none;background:none;border-radius:6px;cursor:pointer;padding:0"/>
+        Code text
+      </label>
+      
+    </div>
+    </div>
+  </div>
+
+  <!-- COVERS LOGO TOGGLE -->
+  <div style="padding:14px 16px;border-top:1px solid #262626;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:13px;color:#d6d6d6;font-weight:600">Show SI logo</div>
+    <button onClick="{{ data.h.toggleCovers }}" style="width:46px;height:26px;border-radius:999px;border:none;cursor:pointer;position:relative;transition:background .15s;background:{{ data.coversTrack }}">
+      <span style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;transform:{{ data.coversKnob }}"></span>
+    </button>
+  </div>
+
+  <!-- PHONE SCREEN (card 3 only) -->
+  <sc-if value="{{ showScreen }}" hint-placeholder-val="">
+    <div style="padding:14px 16px;border-top:1px solid #262626">
+      <div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#808080;font-weight:700;margin-bottom:8px">Phone Screen</div>
+      <div style="font-size:11px;color:#9a9a9a;margin-bottom:10px">The uploaded screenshot sits behind the phone frame and is saved to the current brand.</div>
+      <div style="display:flex;gap:8px">
+        <label style="flex:1;text-align:center;background:#262626;border:1px solid #383838;color:#d6d6d6;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">
+          Upload screen
+          <input type="file" accept="image/*" onChange="{{ data.h.uploadScreen }}" style="display:none"/>
+        </label>
+        <button onClick="{{ data.h.clearScreen }}" style="background:#1a1a1a;border:1px solid #383838;color:#9a9a9a;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -77,6 +77,10 @@ export interface TemplateState {
   showCovers: boolean;
   ballTop: string;
   ballBottom: string;
+  /** SI sport background id. */
+  sport: string;
+  /** SI "No Logo" mode: brand name as text. */
+  textLogo: boolean;
   arrowX: number;
   arrowY: number;
   arrowFlipV: boolean;

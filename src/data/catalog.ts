@@ -1,5 +1,6 @@
 import { BRANDS, CASINO_KEYS, PREDICTION_KEYS, SWEEP_KEYS } from './brands';
-import type { Ball, Brand, CategoryId, TemplateState } from './types';
+import type { Site } from '../site';
+import type { Ball, Brand, CategoryId, OfferDefaults, TemplateState } from './types';
 
 export const CATEGORIES: { id: CategoryId; name: string }[] = [
   { id: 'sportsbooks', name: 'Sportsbooks' },
@@ -63,6 +64,16 @@ export const DEFAULT_OFFER = 'FIRST BET OFFER';
 export const DEFAULT_TCS = '21+. New customers only. T&Cs apply.';
 export const SINGLE_DEFAULTS = { ballTop: 'cherries', ballBottom: 'dice', amount: 'Up to $1,500 + 200 free spins' };
 
+/** A brand's offer defaults, with the site's promo code where the site overrides brand codes. */
+export function brandDefaults(site: Site, b: Brand | undefined): Partial<OfferDefaults> {
+  const d = { ...(b?.defaults || {}) };
+  if (site.forceCode && d.code != null) d.code = site.code;
+  return d;
+}
+
+/** The promo code a brand starts with on this site. */
+export const brandCode = (site: Site, b: Brand | undefined) => (site.forceCode ? site.code : b?.code || site.code);
+
 /** "Start from a format" buttons (structured categories). */
 export const FORMATS = [
   { name: 'Bet & Get', f: { eyebrow: '', line1: 'BET $5', line2: 'GET $150', sub: 'IN BONUS BETS' } },
@@ -77,7 +88,7 @@ export function baseTemplate(over: Partial<TemplateState> = {}): TemplateState {
     promoLabel: 'USE PROMO CODE:', code: 'COVERS', tcs: 'T&Cs apply',
     eyebrow: '', line1: '$1,500', line2: '', sub: 'FIRST BET OFFER', stateNote: '', heroAccentOn: false,
     showPromo: true, showOverlay: true,
-    showCovers: false, ballTop: 'football', ballBottom: 'basketball',
+    showCovers: false, ballTop: 'football', ballBottom: 'basketball', sport: 'generic', textLogo: false,
     arrowX: 0, arrowY: 0, arrowFlipV: false,
     ballTopDX: 0, ballTopDY: 0, ballBottomDX: 0, ballBottomDY: 0,
     bgC: null, textC: null, accentC: null, pillBgC: null, pillTextC: null, ballColorC: null,

@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { BRANDS } from '../data/brands';
-import { baseTemplate, booksFor, DEFAULT_AMOUNT, DEFAULT_OFFER, FORMATS, isSingleCat, SINGLE_DEFAULTS } from '../data/catalog';
+import { baseTemplate, booksFor, brandCode, brandDefaults, DEFAULT_AMOUNT, DEFAULT_OFFER, FORMATS, isSingleCat, SINGLE_DEFAULTS } from '../data/catalog';
 import { TEMPLATE_KEYS, type CategoryId, type TemplateKey, type Templates, type TemplateState } from '../data/types';
+import type { Site } from '../site';
 
 export interface BuilderState extends Templates {
   cat: CategoryId;
@@ -10,9 +11,9 @@ export interface BuilderState extends Templates {
   saved: Partial<Record<CategoryId, Templates>>;
 }
 
-const initial = (): BuilderState => ({
+const initial = (site: Site): BuilderState => ({
   cat: 'sportsbooks', showZones: false, saved: {},
-  t1: baseTemplate({ showCovers: true }), t2: baseTemplate(), t3: baseTemplate(),
+  t1: baseTemplate({ ...site.defaults, showCovers: true }), t2: baseTemplate(site.defaults), t3: baseTemplate(site.defaults),
 });
 
 /** Apply the same change to all three templates. */
@@ -20,12 +21,12 @@ const each = (s: BuilderState, fn: (t: TemplateState, k: TemplateKey) => Partial
   Object.fromEntries(TEMPLATE_KEYS.map(k => [k, { ...s[k], ...fn(s[k], k) }])) as unknown as Templates;
 
 /** Fields the shared "All graphics" panel writes to every template. */
-export type SharedField = 'ballTop' | 'ballBottom' | 'eyebrow' | 'line1' | 'line2' | 'sub' | 'stateNote' | 'promoLabel' | 'code' | 'tcs' | 'bgC' | 'logoOv';
+export type SharedField = 'ballTop' | 'ballBottom' | 'sport' | 'eyebrow' | 'line1' | 'line2' | 'sub' | 'stateNote' | 'promoLabel' | 'code' | 'tcs' | 'bgC' | 'logoOv';
 /** Fields set on one template only. */
 export type CardField = 'textC' | 'accentC' | 'pillBgC' | 'pillTextC' | 'ballColorC' | 'ballTopDX' | 'ballTopDY' | 'ballBottomDX' | 'ballBottomDY' | 'arrowX' | 'arrowY';
 
-export function useBuilder() {
-  const [st, setSt] = useState(initial);
+export function useBuilder(site: Site) {
+  const [st, setSt] = useState(() => initial(site));
 
   const setAll = useCallback((field: SharedField, val: string | null) => setSt(s => ({ ...s, ...each(s, () => ({ [field]: val })) })), []);
   const setCard = useCallback((key: TemplateKey, patch: Partial<TemplateState>) => setSt(s => ({ ...s, [key]: { ...s[key], ...patch } })), []);
@@ -41,11 +42,11 @@ export function useBuilder() {
       let next = saved[id];
       if (!next) {
         const first = Object.keys(booksFor(id))[0];
-        const over: Partial<TemplateState> = isSingleCat(id) ? { ...SINGLE_DEFAULTS } : { ...(BRANDS[first]?.defaults || {}) };
+        const over: Partial<TemplateState> = { ...site.defaults, ...(isSingleCat(id) ? SINGLE_DEFAULTS : brandDefaults(site, BRANDS[first])) };
         next = {
-          t1: baseTemplate({ showCovers: true, book: first, ...over }),
-          t2: baseTemplate({ book: first, ...over }),
-          t3: baseTemplate({ book: first, ...over }),
+          t1: baseTemplate({ ...over, showCovers: true, book: first }),
+          t2: baseTemplate({ ...over, book: first }),
+          t3: baseTemplate({ ...over, book: first }),
         };
       }
       return { ...s, cat: id, saved, ...next };
@@ -53,15 +54,15 @@ export function useBuilder() {
 
     /** Brand applies to all three; each template remembers its offer text per brand. */
     changeBook: (book: string) => setSt(s => {
-      const single = isSingleCat(s.cat), b = BRANDS[book] || {};
+      const single = isSingleCat(s.cat), b = BRANDS[book];
       return {
         ...s, ...each(s, t => {
           const brandText = { ...t.brandText, [t.book]: { amount: t.amount, offer: t.offer } };
           const saved = brandText[book] || {};
           return {
             book,
-            code: single ? t.code : (b.code || 'COVERS'),
-            ...(single ? {} : (b.defaults || {})),
+            code: single ? t.code : brandCode(site, b),
+            ...(single ? {} : brandDefaults(site, b)),
             amount: saved.amount ?? DEFAULT_AMOUNT,
             offer: saved.offer ?? DEFAULT_OFFER,
             brandText,
@@ -78,6 +79,7 @@ export function useBuilder() {
     applyFormat: (i: number) => setSt(s => ({ ...s, ...each(s, () => FORMATS[i].f) })),
     toggleHeroAccent: () => setSt(s => { const v = !s.t1.heroAccentOn; return { ...s, ...each(s, () => ({ heroAccentOn: v })) }; }),
     togglePromo: () => setSt(s => { const v = !s.t1.showPromo; return { ...s, ...each(s, () => ({ showPromo: v })) }; }),
+    toggleTextLogo: () => setSt(s => { const v = !s.t1.textLogo; return { ...s, ...each(s, () => ({ textLogo: v })) }; }),
     toggleZones: () => setSt(s => ({ ...s, showZones: !s.showZones })),
 
     resetColors: (key: TemplateKey) => setCard(key, { bgC: null, textC: null, accentC: null, pillBgC: null, pillTextC: null, ballColorC: null }),
@@ -93,7 +95,7 @@ export function useBuilder() {
     toggleOverlay: () => setSt(s => ({ ...s, t3: { ...s.t3, showOverlay: !s.t3.showOverlay } })),
     toggleArrowFlipV: (key: TemplateKey) => setSt(s => ({ ...s, [key]: { ...s[key], arrowFlipV: !s[key].arrowFlipV } })),
     resetArrow: () => setCard('t3', { arrowX: 0, arrowY: 0, arrowFlipV: false }),
-  }), [setAll, setCard]);
+  }), [setAll, setCard, site]);
 
   return [st, actions] as const;
 }

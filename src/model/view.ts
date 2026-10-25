@@ -1,6 +1,7 @@
 import { asset } from '../data/assets';
 import { ballsFor, booksFor, DEFAULT_TCS, isSingleCat } from '../data/catalog';
 import type { Brand, CategoryId, TemplateKey, TemplateState } from '../data/types';
+import { SPORTS, type Site } from '../site';
 
 // Values the prototype exposed in its design-tool "Tweaks" panel, fixed at
 // the defaults the design shipped with.
@@ -17,12 +18,15 @@ export const TWEAKS = {
 };
 
 export interface ViewCtx {
+  site: Site;
   cat: CategoryId;
   showZones: boolean;
   /** Logo aspect ratio by URL, or 0 while loading. */
   aspect: (src: string) => number;
   /** Tinted ball URL, or the source until the tint is ready. */
   recolor: (src: string, color: string | null) => string;
+  /** SI: brand-recoloured sport background URL. */
+  sportBg: (src: string, bg: string, accent: string, light: boolean) => string;
 }
 
 const BALL_XFORM: Record<TemplateKey, { top: string; bottom: string }> = {
@@ -56,14 +60,16 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
     return sc === 1 ? 'contain' : sc * 100 + '%';
   };
 
-  // Pill colours: a light tint of the accent; light-background brands keep their own dark pill.
-  const own = !!b0.darkWord;
-  const pillFill = s.pillBgC || (own ? b0.pillBg : `color-mix(in srgb, ${accent} 30%, #ffffff)`);
-  const pillLabel = own ? (b0.promoLabelColor || pillFill) : `color-mix(in srgb, ${accent} 50%, #ffffff)`;
+  // Pill colours. Covers: a light tint of the accent, and light-background brands keep their
+  // own dark pill. SI: always a white pill.
+  const own = !!b0.darkWord, plain = ctx.site.plainPill;
+  const pillFill = plain ? '#ffffff' : s.pillBgC || (own ? b0.pillBg : `color-mix(in srgb, ${accent} 30%, #ffffff)`);
+  const pillLabel = own ? (b0.promoLabelColor || (plain ? b0.text : pillFill)) : `color-mix(in srgb, ${accent} 50%, #ffffff)`;
 
   // Logo box sizing from the logo's aspect ratio.
-  const logoSrc = s.logoOv || asset(b0.logo);
-  const ar = (logoSrc && ctx.aspect(logoSrc)) || 2.5;
+  const logoFile = s.logoOv || asset(b0.logo);
+  const textLogo = ctx.site.textLogo && s.textLogo;
+  const ar = (logoFile && ctx.aspect(logoFile)) || 2.5;
   let lg: { box: string; h: string; w: string };
   if (single) {
     const P = { t1: [110000, 190, 640], t2: [55000, 130, 480], t3: [56000, 120, 460] }[key];
@@ -82,10 +88,12 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
   const eyebrow = nz(s.eyebrow), l1 = nz(s.line1), l2 = nz(s.line2), qual = nz(s.sub);
   const lockedTcs = (b0.tcs || DEFAULT_TCS) + (nz(s.stateNote) ? ' ' + nz(s.stateNote) : '');
   const tcsMTSingle = { t1: '22px', t2: '14px', t3: '20px' }[key];
+  const textLogoW = { t1: 640, t2: 600, t3: 520 }[key];
+  const sport = SPORTS.find(x => x.id === s.sport) || SPORTS[0];
   const screen = s.screenByBrand[s.book] || (b0.screen ? asset(b0.screen) : '');
 
   return {
-    key, single, structured: !single, book: b0,
+    key, site: ctx.site, single, structured: !single, book: b0,
     bg: s.bgC || b0.bg, text: s.textC || b0.text, accent,
     lightLogo: own, showCovers: s.showCovers,
 
@@ -125,7 +133,7 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
     // Promo code
     showPromo: s.showPromo, promoLabel: s.promoLabel, code: s.code,
     promoLabelC: pillLabel, pillBg: pillFill,
-    pillText: s.pillTextC || (own ? b0.pillText : '#0c0a06'),
+    pillText: s.pillTextC || (own && !plain ? b0.pillText : '#0c0a06'),
     pillBorder: own ? b0.bg : '#ffffff',
     pillRing: `color-mix(in srgb, ${pillFill} 25%, transparent)`,
 
@@ -140,7 +148,12 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
     bgInput: s.bgC || (/^#[0-9a-f]{6}$/i.test(b0.bg) ? b0.bg : '#000000'),
 
     // Logo
-    logoSrc, logoW: lg.w, logoH: lg.h, logoBoxH: lg.box,
+    logoSrc: textLogo ? '' : logoFile, logoW: lg.w, logoH: lg.h, logoBoxH: lg.box,
+    textLogo, textLogoName: b0.name, textLogoC: own ? b0.text : '#ffffff', textLogoW: textLogoW + 'px',
+    textLogoFS: Math.round(Math.min(parseFloat(lg.h) * 0.9, textLogoW / (Math.max(4, b0.name.length) * 0.6))) + 'px',
+
+    // SI sport background
+    sportBgUrl: ctx.site.decor === 'sport' ? ctx.sportBg(asset(sport.src), s.bgC || b0.bg, s.accentC || b0.ballTint || b0.accent, own) : '',
 
     // Banner + App Screen
     screen,

@@ -10,16 +10,21 @@ An internal tool for building promo graphics. An editor picks a category and a b
 
 Built with Vite, React and TypeScript. It implements the Claude Design prototype in `project/Promo Builder.dc.html`.
 
+### SI Promo Template Builder
+
+The same tool, rebranded for Sports Illustrated, lives at `/si/` (from `project-si/SI Promo Builder.dc.html`). It has Sportsbooks and Prediction Markets only, two graphics (Square Post and Wide Banner), a sport background picker in place of the balls, a "No Logo" text mode, a white promo pill and `SIBONUS` as every brand's code. Everything that differs between the two sites is in `src/site.ts`.
+
 ## Running it
 
 ```bash
 npm install
 npm run dev               # local dev server
 npm run build             # static site in dist/
-npm run build:standalone  # one self-contained HTML file in dist-standalone/index.html
+npm run build:standalone     # Covers as one self-contained HTML file: dist-standalone/index.html
+npm run build:standalone:si  # SI as one self-contained HTML file: dist-standalone/si/index.html
 ```
 
-Every push to `promo-builder-app` also builds the app and publishes it to GitHub Pages (`.github/workflows/pages.yml`). That site is public: anyone with the URL can open it.
+Every push to `promo-builder-app` also builds both pages and publishes them to GitHub Pages (`.github/workflows/pages.yml`): Covers at `/`, SI at `/si/`. That site is public: anyone with the URL can open it.
 
 The standalone file (about 18 MB) bundles every logo, ball, font and library. Editors can open it straight from disk with no network connection, the same way the prototype's `Covers Promo Builder.html` was used.
 
@@ -33,6 +38,8 @@ The standalone file (about 18 MB) bundles every logo, ball, font and library. Ed
 ## Fonts
 
 Licensing: **Founders Grotesk Bold** is used only for the offer text (eyebrow, headline, sub line) and the promo code (pill and phone overlay). Everything else, including the editor UI, the "USE PROMO CODE:" label, T&Cs and the debug readout, uses **Inter**. Both live in `src/fonts/` and are bundled into the build. Don't add other paid fonts without checking their web licence.
+
+The SI page uses **Industry** (Hold Fast Foundry) for everything. Its files are **not committed** (see `.gitignore`) until a web licence is confirmed. To use it, put `Industry-Light/Book/Medium/Demi/Bold/Black.ttf` in `src/fonts/`; `src/fonts.ts` picks them up automatically. Without them, the SI page falls back to a locally installed Industry or to sans-serif, and the text fitting adjusts to whatever font is used.
 
 ## Code map
 

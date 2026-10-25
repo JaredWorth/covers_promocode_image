@@ -3,6 +3,7 @@ import { FORMATS } from '../data/catalog';
 import type { TemplateState } from '../data/types';
 import type { Actions } from '../model/store';
 import type { View } from '../model/view';
+import type { Site } from '../site';
 
 /** Read an uploaded image as a blob URL. */
 export const readImg = (e: ChangeEvent<HTMLInputElement>, cb: (url: string) => void) => {
@@ -12,24 +13,26 @@ export const readImg = (e: ChangeEvent<HTMLInputElement>, cb: (url: string) => v
 };
 
 interface Props {
+  site: Site;
   /** Square template state + view: the shared panel reads from it and writes to all three. */
   s: TemplateState;
   v: View;
   a: Actions;
   books: { id: string; name: string }[];
+  /** Ball options (Covers) or sport backgrounds (SI). */
   balls: { id: string; name: string }[];
   showZones: boolean;
   fitWarn: string;
 }
 
-/** "All graphics" panel: brand, balls, offer copy, promo code and T&Cs for all three templates. */
-export function SharedControls({ s, v, a, books, balls, showZones, fitWarn }: Props) {
+/** "All graphics" panel: brand, balls, offer copy, promo code and T&Cs for every template. */
+export function SharedControls({ site, s, v, a, books, balls, showZones, fitWarn }: Props) {
   const text = (field: Parameters<Actions['setAll']>[0]) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => a.setAll(field, e.target.value);
   return (
-    <div style={{ background: '#0e1318', border: '1px solid #1b2530', borderRadius: 14, padding: '18px 20px' }}>
+    <div style={{ background: 'var(--panel)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 20px' }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
-        <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 700, color: '#FD5000' }}>All graphics</div>
-        <div style={{ fontSize: 12, color: '#8a93a0' }}>Edits here apply to all three graphics</div>
+        <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', fontWeight: 700, color: 'var(--accent)' }}>All graphics</div>
+        <div style={{ fontSize: 12, color: 'var(--muted)' }}>Edits here apply to {site.templates.length === 2 ? 'both graphics' : 'all three graphics'}</div>
       </div>
       {fitWarn && (
         <div role="alert" style={{ background: '#2a0f10', border: '1px solid #d83a3a', color: '#ff8a8a', borderRadius: 8, padding: '9px 12px', fontSize: 12, fontWeight: 600, marginBottom: 14 }}>
@@ -61,16 +64,31 @@ export function SharedControls({ s, v, a, books, balls, showZones, fitWarn }: Pr
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            {(['ballTop', 'ballBottom'] as const).map((f, i) => (
-              <div key={f} style={{ flex: 1 }}>
-                <label className="lbl" htmlFor={f}>Ball {i ? 'B' : 'A'}</label>
-                <select id={f} className="field" value={s[f]} onChange={text(f)}>
+          {site.decor === 'sport' ? (
+            <>
+              <div>
+                <label className="lbl" htmlFor="sport">Background</label>
+                <select id="sport" className="field" value={s.sport} onChange={text('sport')}>
                   {balls.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
               </div>
-            ))}
-          </div>
+              <label className="check">
+                <input type="checkbox" checked={s.textLogo} onChange={a.toggleTextLogo} style={{ width: 18, height: 18, margin: '3px 3px 3px 4px' }} />
+                <span>No Logo (use brand name as text)</span>
+              </label>
+            </>
+          ) : (
+            <div style={{ display: 'flex', gap: 10 }}>
+              {(['ballTop', 'ballBottom'] as const).map((f, i) => (
+                <div key={f} style={{ flex: 1 }}>
+                  <label className="lbl" htmlFor={f}>Ball {i ? 'B' : 'A'}</label>
+                  <select id={f} className="field" value={s[f]} onChange={text(f)}>
+                    {balls.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
+              ))}
+            </div>
+          )}
           {v.hasHeroAccent && (
             <label className="check">
               <input type="checkbox" checked={s.heroAccentOn} onChange={a.toggleHeroAccent} />

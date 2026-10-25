@@ -1,5 +1,6 @@
 import type { CategoryId, TemplateKey, TemplateState } from '../data/types';
 import { TWEAKS } from '../model/view';
+import type { Site } from '../site';
 
 // Layout engine for the three canvases. It runs after every render, measures
 // the real DOM (fonts, glyph ink, logo alpha) and writes positions and sizes
@@ -25,7 +26,7 @@ const CFG: Record<TemplateKey, FormatCfg> = {
   t3: { W: 1294, H: 728, tm: 16, tp: 18, cov: null, xl: 0, xr: 690, bt: { x: 851, y: 80, s: 346 }, bb: { x: 1186, y: 676, s: 476 } },
 };
 
-/** Max hero font size per format (canvas px). */
+/** Max hero font size per format (canvas px); Wide comes from the site profile. */
 const HERO_MAX: Record<TemplateKey, number> = { t1: 220, t2: 240, t3: 220 };
 
 /** Promo pill spec in export px (Wide / Banner + App are 976 wide, canvas is 1294). */
@@ -56,7 +57,7 @@ export class LayoutEngine {
   private measureCtx: CanvasRenderingContext2D | null = null;
 
   /** Called when an async measurement (logo alpha) lands and layout should re-run. */
-  constructor(private onAsync: () => void) {}
+  constructor(private site: Site, private onAsync: () => void) {}
 
   // ---------- shared measurement helpers ----------
 
@@ -99,6 +100,13 @@ export class LayoutEngine {
       im.src = src;
     }
     return this.inkCache[src];
+  }
+
+  /** Shift the code so its glyph ink, not its line box, is centred in the pill (SI). */
+  private centerCode(el: HTMLElement) {
+    el.style.transform = 'none';
+    const k = this.inkIns(el);
+    el.style.transform = 'translateY(' + -(k[0] - k[1]) / 2 + 'px)';
   }
 
   // ---------- Casino / Sweepstakes (single offer text) ----------
@@ -177,6 +185,12 @@ export class LayoutEngine {
         const w = e.offsetWidth;
         if (w > capW) fs(e, Math.floor(f * capW / w * 10) / 10);
       });
+      const gapR = this.site.layout.subGapRatio;
+      if (gapR != null && sv && sub && heroes.length) {
+        // SI: sub line sits gapR × hero size below the headline, measured ink to ink.
+        const last = heroes[heroes.length - 1], c = this.inkIns(last), s0 = this.inkIns(sub), cap = last.offsetHeight - c[0] - c[1];
+        sub.style.marginTop = gapR * h - cap - (c[1] + s0[0]) + 'px';
+      }
       if (ev && eye && heroes.length) {
         // Gap eyebrow→headline matches the headline→sub line gap, measured on glyph ink.
         const a = this.inkIns(eye), b = this.inkIns(heroes[0]), c = this.inkIns(heroes[heroes.length - 1]);
@@ -184,10 +198,12 @@ export class LayoutEngine {
       }
     };
     const ok = () => st.offsetHeight <= avail + 1 && heroes.every(e => e.offsetWidth <= W + 1) && (!ev || eye!.offsetWidth <= W + 1);
-    let lo = 40, hi = HERO_MAX[key], warn = false;
+    // SI Wide Banner with no code: let the offer fill the full width, then settle at 85%.
+    const fill = this.site.layout.wideNoCodeFill && key === 't2' && !inp.state.showPromo;
+    let lo = 40, hi = fill ? 700 : key === 't2' ? this.site.layout.heroMaxWide : HERO_MAX[key], warn = false;
     apply(lo); if (!ok()) warn = true;
     for (let i = 0; i < 16; i++) { const m = (lo + hi) / 2; apply(m); if (ok()) lo = m; else hi = m; }
-    if (!warn && (inp.cat === 'predictions' || (key !== 't1' && !inp.state.showPromo))) lo *= 0.8;
+    if (!warn && (inp.cat === 'predictions' || (key !== 't1' && !inp.state.showPromo))) lo *= fill ? 0.85 : 0.8;
     const ref = Math.floor(lo); apply(ref);
     const h = st.offsetHeight, mw = Math.max(0, ...heroes.map(e => e.offsetWidth), ev ? eye!.offsetWidth : 0);
     const f = warn ? Math.min(1, h ? avail / h : 1, mw ? W / mw : 1) : 1;
@@ -220,11 +236,13 @@ export class LayoutEngine {
     lb.style.fontSize = lab + 'px'; lb.style.marginTop = '0px';
     Object.assign(pill.style, {
       height: h + 'px', minWidth: min + 'px', maxWidth: max + 'px', padding: '0 ' + pad + 'px', boxSizing: 'border-box',
-      marginTop: P.gap * s + ring + 'px', boxShadow: '0 0 0 ' + ring + 'px ' + (pill.dataset.ring || 'transparent') + ',0 18px 50px rgba(0,0,0,.45)',
+      marginTop: P.gap * s + ring + 'px',
+      boxShadow: this.site.plainPill ? '0 18px 50px rgba(0,0,0,.45)' : '0 0 0 ' + ring + 'px ' + (pill.dataset.ring || 'transparent') + ',0 18px 50px rgba(0,0,0,.45)',
     });
     let f = P.fs * s; cp.style.fontSize = f + 'px';
     const inner = max - 2 * pad - 16;
     while (cp.scrollWidth > inner && f > lab + 1) { f--; cp.style.fontSize = f + 'px'; }
+    if (this.site.plainPill) this.centerCode(cp);
     return { need: u.offsetHeight + 2 * ring, w: pill.offsetWidth, h: pill.offsetHeight, f, P, maxU: max / s };
   }
 
@@ -234,13 +252,21 @@ export class LayoutEngine {
     const q = (n: string) => root.querySelector<HTMLElement>('[data-zone="' + n + '"]');
     const lz = q('logo'), oz = q('offer'), cz = q('code'), tz = q('tcs');
     if (!lz || !oz || !tz) return '';
-    const C = CFG[key], s = inp.state, W = C.W, H = C.H;
+    const tl = lz.querySelector<HTMLElement>('[data-textlogo]');
+    if (tl) {
+      // SI "No Logo": shrink the brand name until it fits its box.
+      let f = parseFloat(tl.style.fontSize) || 60; tl.style.fontSize = f + 'px';
+      while (tl.scrollWidth > tl.clientWidth + 1 && f > 10) { f--; tl.style.fontSize = f + 'px'; }
+    }
+    const C = CFG[key], s = inp.state, W = C.W, H = C.H, L = this.site.layout;
+    const xl = key === 't2' ? L.wideX[0] : C.xl, xr = key === 't2' ? L.wideX[1] : C.xr;
     const sq = key === 't1' && !cz;
     const mW = (key === 't3' ? 0.06 : sq ? 0.03 : 0.045) * W, mH = (sq ? 0.05 : 0.06) * H;
     const place = (el: HTMLElement, x0: number, x1: number, y0: number, y1: number, noH?: boolean) => {
       const o = el.style; o.left = x0 + 'px'; o.top = y0 + 'px'; o.width = x1 - x0 + 'px'; if (!noH) o.height = y1 - y0 + 'px';
     };
-    const base: [number, number] = [Math.max(mW, C.xl), Math.min(W - mW, C.xr)], mid = (base[0] + base[1]) / 2;
+    const wideFill = L.wideNoCodeFill && key === 't2' && !s.showPromo;
+    const base: [number, number] = wideFill ? [mW, W - mW] : [Math.max(mW, xl), Math.min(W - mW, xr)], mid = (base[0] + base[1]) / 2;
     const circ = ([[C.bt, s.ballTopDX, s.ballTopDY], [C.bb, s.ballBottomDX, s.ballBottomDY]] as [Circle, number, number][])
       .map(([c, dx, dy]) => ({ x: c.x + (dx || 0), y: c.y + (dy || 0), r: 0.46 * c.s + 24 }));
     // Horizontal span between y0..y1; on Banner + App it narrows to clear the balls.
@@ -280,7 +306,7 @@ export class LayoutEngine {
     let cH = 0, pv: ReturnType<LayoutEngine['stylePill']> | null = null;
     if (cz) { pv = this.stylePill(key, cz, base[1] - base[0]); cH = pv.need; }
     const gc = 60 / 1080 * H;
-    const oH = Math.max(60, fy0 - top - logoH - 2 * g - (cz ? gc : 0) - cH), oy0p = top + logoH + g, oy1p = oy0p + oH;
+    const oH = Math.max(60, fy0 - top - logoH - (1 + L.logoGap) * g - (cz ? gc : 0) - cH), oy0p = top + logoH + g, oy1p = oy0p + oH;
     let osp: [number, number] = [base[0], base[1]], res: StackFit = { warn: false, h: 0 };
     const yc0 = (oy0p + oy1p) / 2, maxI = (base[1] - base[0]) * 0.3;
     const tryIns = (ins: number) => {
@@ -304,10 +330,10 @@ export class LayoutEngine {
     const ring = cz ? 0.08 * PILL[key].h * PILL[key].s : 0;
     const uH = pv ? pv.need - 2 * ring : 0, Ch = pv ? pv.need - ring : 0, nG = cz ? 3 : 2;
     const G = 60 / 1080 * H, Lh = lB - lT, Oh = res.h - oi0 - oi1, Th = fine - ti[0] - ti[1];
-    const tot = Lh + Oh + Th + Ch + nG * G;
+    const tot = Lh + Oh + Th + Ch + nG * G + (L.logoGap - 1) * G;
     const y0 = top + (bot - top - tot) / 2;
     const lt = y0 - lT;
-    const ob0 = y0 + Lh + G - oi0, ob1 = ob0 + res.h;
+    const ob0 = y0 + Lh + L.logoGap * G - oi0, ob1 = ob0 + res.h;
     let nb = ob1 - oi1, cs: [number, number] | null = null, cy0 = 0, cy1 = 0;
     if (cz) {
       const cv0 = nb + G; cy0 = cv0 + uH / 2 - cH / 2; cy1 = cy0 + cH;
@@ -358,7 +384,7 @@ export class LayoutEngine {
   /** Lay out all three canvases. Returns the fit warning for the shared panel ('' when all fit). */
   run(cat: CategoryId, showZones: boolean, states: Record<TemplateKey, TemplateState>, roots: Record<TemplateKey, HTMLElement | null>): string {
     if (cat === 'casino' || cat === 'sweepstakes') { this.runSingle(roots); return ''; }
-    return (Object.keys(roots) as TemplateKey[])
+    return this.site.templates
       .map(k => { const r = this.layoutKey(k, { cat, showZones, state: states[k], root: roots[k] }); return r ? FORMAT_NAMES[k] + ' (' + r + ')' : ''; })
       .filter(Boolean).join(', ');
   }

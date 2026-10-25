@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "build:standalone": "tsc -b && vite build --mode standalone",
     "preview": "vite preview",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "build:standalone:si": "tsc -b && vite build --mode standalone-si"
   },
   "dependencies": {
     "html-to-image": "1.11.11",

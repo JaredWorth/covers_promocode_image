@@ -16,7 +16,8 @@ interface FormatGeo {
   fallback: { box: number; radius: number; border: number; initial: number; word: number; gap: number };
   single: { font: number; letterSpacing: string; width: number; maxH: number };
   labelSize: number;
-  covers: { bottom: number; h: number; gap: number } | null;
+  /** Footer logo placement (its height comes from the site profile). */
+  covers: { bottom: number; gap: number } | null;
 }
 
 const SHADOW_SQ = 'drop-shadow(0 24px 44px rgba(0,0,0,.55))';
@@ -31,7 +32,7 @@ const GEO: Record<TemplateKey, FormatGeo> = {
     fallback: { box: 88, radius: 12, border: 5, initial: 52, word: 72, gap: 18 },
     single: { font: 250, letterSpacing: '-3px', width: 850, maxH: 365 },
     labelSize: 33,
-    covers: { bottom: 18, h: 54, gap: 18 },
+    covers: { bottom: 18, gap: 18 },
   },
   t2: {
     W: 1294, H: 728,
@@ -41,7 +42,7 @@ const GEO: Record<TemplateKey, FormatGeo> = {
     fallback: { box: 64, radius: 10, border: 4, initial: 38, word: 54, gap: 14 },
     single: { font: 205, letterSpacing: '-2px', width: 980, maxH: 300 },
     labelSize: 24,
-    covers: { bottom: 20, h: 34, gap: 12 },
+    covers: { bottom: 20, gap: 12 },
   },
   t3: {
     W: 1294, H: 728,
@@ -56,10 +57,8 @@ const GEO: Record<TemplateKey, FormatGeo> = {
 };
 
 const WAVE_MASK = 'linear-gradient(180deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%)';
-// Licensing: Founders Grotesk Bold is only for the offer text and the promo code; everything else is Inter.
-const FG = "'Founders Grotesk'";
-const INTER = "'Inter', sans-serif";
-const DEBUG_FONT = "700 26px 'Inter', sans-serif";
+// Fonts come from the site profile. Covers licensing: Founders Grotesk Bold is only
+// for the offer text and the promo code; everything else is Inter.
 
 function Ball({ geo, url, size, transform }: { geo: BallGeo; url: string; size: string; transform: string }) {
   return (
@@ -71,10 +70,12 @@ function Ball({ geo, url, size, transform }: { geo: BallGeo; url: string; size: 
 }
 
 function LogoZone({ v, g }: { v: View; g: FormatGeo }) {
-  const f = g.fallback, b = v.book;
+  const f = g.fallback, b = v.book, FG = v.site.displayFont;
   return (
     <div data-zone="logo" style={{ position: v.zPos, height: v.logoBoxH, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      {v.logoSrc ? (
+      {v.textLogo ? (
+        <div data-textlogo="1" style={{ width: v.textLogoW, height: v.logoH, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FG, fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap', lineHeight: 1, letterSpacing: '.01em', color: v.textLogoC, fontSize: v.textLogoFS }}>{v.textLogoName}</div>
+      ) : v.logoSrc ? (
         <div style={{ width: v.logoW, height: v.logoH, backgroundImage: `url("${v.logoSrc}")`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }} />
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: f.gap }}>
@@ -90,9 +91,8 @@ function LogoZone({ v, g }: { v: View; g: FormatGeo }) {
   );
 }
 
-const lineBase: CSSProperties = { fontFamily: FG, fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' };
-
 function OfferStack({ v }: { v: View }) {
+  const lineBase: CSSProperties = { fontFamily: v.site.displayFont, fontWeight: 700, textTransform: 'uppercase', whiteSpace: 'nowrap' };
   return (
     <div data-zone="offer" style={{ position: 'absolute', left: 0, top: 0, width: 10, height: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div data-stack="1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', color: v.heroColor, transformOrigin: 'center' }}>
@@ -112,7 +112,7 @@ function SingleOffer({ v, g }: { v: View; g: FormatGeo }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 80, maxHeight: sg.maxH }}>
       <div data-hl="1" style={{
-        fontFamily: FG, fontWeight: 700, fontSize: sg.font, lineHeight: v.hlLH, textTransform: v.hlTT, color: v.text, marginTop: 0,
+        fontFamily: v.site.displayFont, fontWeight: 700, fontSize: sg.font, lineHeight: v.hlLH, textTransform: v.hlTT, color: v.text, marginTop: 0,
         letterSpacing: sg.letterSpacing, width: sg.width, textAlign: 'center', boxSizing: 'border-box', overflowWrap: 'normal', wordBreak: 'normal',
       }}>{v.amount}</div>
     </div>
@@ -120,16 +120,20 @@ function SingleOffer({ v, g }: { v: View; g: FormatGeo }) {
 }
 
 function CodeZone({ v, g }: { v: View; g: FormatGeo }) {
+  // SI: plain white pill without border or ring; the engine centres the code on its ink.
+  const plain = v.site.plainPill;
   return (
     <div data-zone="code" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center' }}>
       <div data-unit="1" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', transformOrigin: 'center' }}>
-        <div style={{ fontFamily: INTER, fontSize: g.labelSize, color: v.promoLabelC, letterSpacing: '.14em', marginTop: v.lblMT, fontWeight: 400, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{v.promoLabel}</div>
+        <div style={{ fontFamily: v.site.labelFont, fontSize: g.labelSize, color: v.promoLabelC, letterSpacing: '.14em', marginTop: v.lblMT, fontWeight: 400, textTransform: 'uppercase', whiteSpace: 'nowrap' }}>{v.promoLabel}</div>
         <div data-pill="1" data-ring={v.pillRing} style={{
           marginTop: v.pillMT, width: 'fit-content', maxWidth: v.pillMaxW, overflow: 'hidden', padding: '26px 64px', background: v.pillBg, borderRadius: 999,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', border: `8px solid ${v.pillBorder}`,
-          boxShadow: `0 0 0 14px ${v.pillRing},0 18px 50px rgba(0,0,0,.45)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', border: plain ? 'none' : `8px solid ${v.pillBorder}`,
+          boxShadow: plain ? '0 18px 50px rgba(0,0,0,.45)' : `0 0 0 14px ${v.pillRing},0 18px 50px rgba(0,0,0,.45)`,
         }}>
-          <span data-code="1" style={{ fontFamily: FG, fontWeight: 700, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, position: 'relative', top: '0.185em', transform: 'none' }}>{v.code}</span>
+          <span data-code="1" style={plain
+            ? { fontFamily: v.site.displayFont, fontWeight: 900, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, transform: 'none' }
+            : { fontFamily: v.site.displayFont, fontWeight: 700, fontSize: 96, color: v.pillText, letterSpacing: '.01em', whiteSpace: 'nowrap', lineHeight: 0.712, position: 'relative', top: '0.185em', transform: 'none' }}>{v.code}</span>
         </div>
       </div>
     </div>
@@ -140,7 +144,7 @@ function TcsZone({ v }: { v: View }) {
   return (
     <div data-zone="tcs" style={{ position: v.zPos, display: v.zDisp, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div data-role="tcs" style={{
-        fontFamily: INTER, fontSize: v.tcsFS, lineHeight: 1.25, color: v.text, opacity: 0.62, marginTop: v.tcsMT,
+        fontFamily: v.site.labelFont, fontSize: v.tcsFS, lineHeight: 1.25, color: v.text, opacity: 0.62, marginTop: v.tcsMT,
         width: v.tcsW, height: 'auto', overflow: 'visible', textAlign: 'center',
       }}>{v.tcs}</div>
     </div>
@@ -156,13 +160,13 @@ const DEBUG_ZONES: [string, string, string, boolean][] = [
   ['tcs', '#6dff7a', 'FINE PRINT', false],
 ];
 
-function DebugLayer({ on }: { on: boolean }) {
+function DebugLayer({ on, font }: { on: boolean; font: string }) {
   return (
     <div data-debug="1" style={{ position: 'absolute', inset: 0, zIndex: 10000, pointerEvents: 'none', display: on ? 'block' : 'none' }}>
-      <div data-dz="readout" style={{ position: 'absolute', zIndex: 2, font: DEBUG_FONT, color: '#ffffff', background: 'rgba(0,0,0,.75)', border: '2px solid #ffffff', padding: '4px 10px', whiteSpace: 'nowrap' }} />
+      <div data-dz="readout" style={{ position: 'absolute', zIndex: 2, font, color: '#ffffff', background: 'rgba(0,0,0,.75)', border: '2px solid #ffffff', padding: '4px 10px', whiteSpace: 'nowrap' }} />
       {DEBUG_ZONES.map(([id, c, label, dashed]) => (
         <div key={id} data-dz={id} style={{ position: 'absolute', border: `3px ${dashed ? 'dashed' : 'solid'} ${c}`, boxSizing: 'border-box' }}>
-          <span style={{ position: 'absolute', left: 6, top: 3, font: DEBUG_FONT, color: c, background: 'rgba(0,0,0,.6)', padding: '0 6px', whiteSpace: 'nowrap' }}>{label}</span>
+          <span style={{ position: 'absolute', left: 6, top: 3, font, color: c, background: 'rgba(0,0,0,.6)', padding: '0 6px', whiteSpace: 'nowrap' }}>{label}</span>
         </div>
       ))}
     </div>
@@ -173,7 +177,7 @@ function CoversFooter({ v, g }: { v: View; g: FormatGeo }) {
   if (!g.covers || !v.showCovers) return null;
   return (
     <div style={{ position: 'absolute', bottom: g.covers.bottom, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: g.covers.gap }}>
-      <img src={asset(v.lightLogo ? 'assets/covers-logo-dark.svg' : 'assets/covers-logo.svg')} style={{ height: g.covers.h }} alt="" />
+      <img src={asset(v.lightLogo ? v.site.footer.dark : v.site.footer.light)} style={{ height: v.site.footer.h[v.key] }} alt="" />
     </div>
   );
 }
@@ -186,7 +190,7 @@ function Phone({ v }: { v: View }) {
       {v.screen ? (
         <div style={{ ...screenBox, overflow: 'hidden', backgroundColor: '#fff', backgroundImage: `url("${v.screen}")`, backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat' }} />
       ) : (
-        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: INTER, textAlign: 'center', padding: '0 24px' }}>
+        <div style={{ ...screenBox, background: '#f1f3f5', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9aa3ad', fontFamily: v.site.labelFont, textAlign: 'center', padding: '0 24px' }}>
           <div style={{ fontSize: 34 }}>＋</div>
           <div style={{ fontSize: 18, fontWeight: 600 }}>Upload a screen<br />for this brand</div>
         </div>
@@ -194,7 +198,7 @@ function Phone({ v }: { v: View }) {
       <img src={asset('assets/iphone-frame.png')} alt="" style={{ position: 'absolute', inset: 0, width: 438, height: 839, pointerEvents: 'none', left: 15, top: 3 }} />
       {v.overlayOn && (
         <div style={{ position: 'absolute', left: v.phoneCode.left, top: v.phoneCode.top, maxWidth: '82%', minWidth: v.phoneCode.minW, background: v.phoneCode.bg, borderRadius: 7, display: 'inline-flex', alignItems: 'center', padding: '4px 14px 2px', boxSizing: 'border-box' }}>
-          <span style={{ fontFamily: FG, fontWeight: 700, fontSize: v.phoneCode.font, color: '#15202b', letterSpacing: '.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.12 }}>{v.code}</span>
+          <span style={{ fontFamily: v.site.displayFont, fontWeight: 700, fontSize: v.phoneCode.font, color: '#15202b', letterSpacing: '.02em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.12 }}>{v.code}</span>
         </div>
       )}
     </div>
@@ -216,11 +220,18 @@ export const PromoCanvas = forwardRef<HTMLDivElement, { fmt: TemplateKey; v: Vie
   const column: CSSProperties = t3
     ? { left: v.colBox.l, top: v.colBox.t, width: v.colBox.w, height: v.colBox.h }
     : { inset: 0, left: v.colLeft, top: v.colTop };
-  const bottomBall = <Ball geo={g.ballBottom} url={v.ballBottomUrl} size={v.ballBottomSize} transform={v.ballBottomTransform} />;
+  const balls = v.site.decor === 'balls';
+  const bottomBall = balls && <Ball geo={g.ballBottom} url={v.ballBottomUrl} size={v.ballBottomSize} transform={v.ballBottomTransform} />;
   return (
-    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: INTER }}>
-      <img src={asset('assets/comm-bg-wave.svg')} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', WebkitMaskImage: WAVE_MASK, maskImage: WAVE_MASK }} />
-      <Ball geo={g.ballTop} url={v.ballTopUrl} size={v.ballTopSize} transform={v.ballTopTransform} />
+    <div ref={ref} style={{ width: g.W, height: g.H, position: 'relative', overflow: 'hidden', background: v.bg, fontFamily: v.site.labelFont }}>
+      {balls ? (
+        <>
+          <img src={asset('assets/comm-bg-wave.svg')} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', WebkitMaskImage: WAVE_MASK, maskImage: WAVE_MASK }} />
+          <Ball geo={g.ballTop} url={v.ballTopUrl} size={v.ballTopSize} transform={v.ballTopTransform} />
+        </>
+      ) : (
+        <div style={{ position: 'absolute', inset: 0, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundImage: `url("${v.sportBgUrl}")` }} />
+      )}
       {!g.bottomBallLast && bottomBall}
       <div style={{ position: 'absolute', zIndex: 2, ...column, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: v.colPad, justifyContent: v.colJustify }}>
         <LogoZone v={v} g={g} />
@@ -229,7 +240,7 @@ export const PromoCanvas = forwardRef<HTMLDivElement, { fmt: TemplateKey; v: Vie
         {v.showPromo && <CodeZone v={v} g={g} />}
         <TcsZone v={v} />
       </div>
-      <DebugLayer on={v.showDebug} />
+      <DebugLayer on={v.showDebug} font={v.site.debugFont} />
       <CoversFooter v={v} g={g} />
       {t3 && <Arrow v={v} />}
       {t3 && <Phone v={v} />}
