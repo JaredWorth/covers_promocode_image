@@ -50,7 +50,7 @@ The standalone file (about 18 MB) bundles every logo, ball, font and library. Ed
 
 ## How it works
 
-- **Categories:** Sportsbooks and Prediction Markets use the structured offer layout: eyebrow, up to two headline lines, a sub line, a promo code and locked T&Cs. Casino and Sweepstakes use a single offer-text field and free-text T&Cs.
+- **Categories:** Sportsbooks and Prediction Markets use the structured offer layout: eyebrow, up to two headline lines, a sub line, a promo code and T&Cs. The T&Cs start from the brand's default text. Editors can change them, and the edit is kept for that brand only, until the page is reloaded or Reset is pressed. Casino and Sweepstakes use a single offer-text field and free-text T&Cs.
 - **All graphics panel:** brand, logo upload, main colour, balls, offer copy, promo code and T&Cs. These apply to all three graphics.
 - **Per-graphic panels:** ball position, colour overrides, the Covers logo toggle, and on Banner + App Screen only, the phone screenshot plus the arrow and code overlay.
 - **Show zones:** draws the zone grid and a size readout on the structured layouts. It is never included in exports.
@@ -67,7 +67,7 @@ The SBR page uses **Factoria Bold** for the offer text and phone code overlay. I
 
 | Path | What it holds |
 |---|---|
-| `src/data/brands.ts` | Brand database: name, logo, colours, default code, locked T&Cs, offer defaults. Category membership is set by the `PREDICTION_KEYS`, `CASINO_KEYS` and `SWEEP_KEYS` lists; any brand in none of them is a Sportsbook. |
+| `src/data/brands.ts` | Brand database: name, logo, colours, default code, default T&Cs, offer defaults. Category membership is set by the `PREDICTION_KEYS`, `CASINO_KEYS` and `SWEEP_KEYS` lists; any brand in none of them is a Sportsbook. |
 | `src/data/catalog.ts` | Categories, ball lists, format presets, default template state. |
 | `src/model/view.ts` | Derives everything a graphic renders from its state and brand (colours, logo sizing, pill tint and so on). |
 | `src/model/store.ts` | Editor state and actions. |

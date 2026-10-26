@@ -17,7 +17,7 @@ body { margin: 0; background: var(--page); }
 .field.caps { text-transform: uppercase; }
 .field.code { font-weight: 700; letter-spacing: .04em; }
 textarea.field { line-height: 1.45; display: block; }
-textarea.field.locked { min-height: 96px; height: 96px; resize: none; color: var(--muted); cursor: not-allowed; }
+textarea.field.brand-tcs { min-height: 96px; height: 120px; resize: vertical; }
 textarea.field.free { min-height: 120px; height: 150px; resize: vertical; }
 input[type=color].field { height: 37px; padding: 3px; cursor: pointer; }
 

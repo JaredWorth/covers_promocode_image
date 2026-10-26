@@ -167,8 +167,11 @@ export function SharedControls({ site, s, v, a, books, balls, showZones, fitWarn
           {v.structured ? (
             <>
               <div>
-                <label className="lbl" htmlFor="tcs-locked">T&amp;Cs (set by brand · read-only)</label>
-                <textarea id="tcs-locked" className="field locked" readOnly value={v.lockedTcs} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 6, minHeight: 24 }}>
+                  <label className="lbl" htmlFor="tcs-brand" style={{ margin: 0 }}>T&amp;Cs {v.tcsEdited ? '(edited for this brand)' : '(brand default)'}</label>
+                  {v.tcsEdited && <button type="button" className="btn-ghost sm" aria-label="Reset T&Cs to brand default" title="Reset to brand default" onClick={() => a.setBrandTcs(null)}>Reset</button>}
+                </div>
+                <textarea id="tcs-brand" className="field brand-tcs" value={v.brandTcs} onChange={e => a.setBrandTcs(e.target.value)} />
               </div>
               <div>
                 <label className="lbl" htmlFor="state-note">State note (optional, appended to T&amp;Cs)</label>

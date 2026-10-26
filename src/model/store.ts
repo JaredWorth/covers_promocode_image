@@ -78,6 +78,15 @@ export function useBuilder(site: Site) {
       ...s, ...each(s, t => ({ amount: val, brandText: { ...t.brandText, [t.book]: { ...t.brandText[t.book], amount: val } } })),
     })),
 
+    /** Structured T&Cs, saved to the current brand; null restores the brand's own. */
+    setBrandTcs: (val: string | null) => setSt(s => ({
+      ...s, ...each(s, t => {
+        const m = { ...t.tcsByBrand };
+        if (val === null) delete m[t.book]; else m[t.book] = val;
+        return { tcsByBrand: m };
+      }),
+    })),
+
     applyFormat: (i: number) => setSt(s => ({ ...s, ...each(s, () => FORMATS[i].f) })),
     toggleHeroAccent: () => setSt(s => { const v = !s.t1.heroAccentOn; return { ...s, ...each(s, () => ({ heroAccentOn: v })) }; }),
     togglePromo: () => setSt(s => { const v = !s.t1.showPromo; return { ...s, ...each(s, () => ({ showPromo: v })) }; }),

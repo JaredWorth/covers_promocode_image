@@ -104,7 +104,8 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
   }
 
   const eyebrow = nz(s.eyebrow), l1 = nz(s.line1), l2 = nz(s.line2), qual = nz(s.sub);
-  const lockedTcs = (b0.tcs || DEFAULT_TCS) + (nz(s.stateNote) ? ' ' + nz(s.stateNote) : '');
+  const brandTcs = s.tcsByBrand[s.book] ?? (b0.tcs || DEFAULT_TCS);
+  const fullTcs = brandTcs + (nz(s.stateNote) ? ' ' + nz(s.stateNote) : '');
   const tcsMTSingle = { t1: '22px', t2: '14px', t3: '20px' }[key];
   const textLogoW = { t1: 640, t2: 600, t3: 520 }[key];
   const sport = SPORTS.find(x => x.id === s.sport) || SPORTS[0];
@@ -125,10 +126,10 @@ export function computeView(key: TemplateKey, s: TemplateState, ctx: ViewCtx) {
     subPh: !qual && eyebrow ? 'Not enough room for this' : 'e.g. IN BONUS BETS',
     heroColor: s.textC || (s.heroAccentOn && b0.heroAccent ? accent : (own ? b0.text : '#ffffff')),
     hasHeroAccent: !single && !!b0.heroAccent,
-    lockedTcs,
+    brandTcs, tcsEdited: s.tcsByBrand[s.book] !== undefined,
 
     // Fine print
-    tcs: single ? s.tcs : lockedTcs,
+    tcs: single ? s.tcs : fullTcs,
     tcsFS: single ? { t1: '25px', t2: '17px', t3: '21px' }[key] : undefined,
     tcsW: single ? 'auto' : '100%',
     tcsMT: single ? tcsMTSingle : '0px',

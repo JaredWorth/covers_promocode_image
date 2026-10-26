@@ -92,7 +92,7 @@ export const FORMATS = [
 export function baseTemplate(over: Partial<TemplateState> = {}): TemplateState {
   return {
     book: 'betmgm', amount: DEFAULT_AMOUNT, offer: DEFAULT_OFFER,
-    brandText: {}, screenByBrand: {},
+    brandText: {}, screenByBrand: {}, tcsByBrand: {},
     promoLabel: 'USE PROMO CODE:', code: 'COVERS', tcs: 'T&Cs apply',
     eyebrow: '', line1: '$1,500', line2: '', sub: 'FIRST BET OFFER', stateNote: '', heroAccentOn: false,
     showPromo: true, showOverlay: true, showArrow: true,

@@ -37,7 +37,7 @@ export interface Brand {
   heroAccent?: boolean;
   /** Default promo code. */
   code?: string;
-  /** Locked T&Cs (structured categories). */
+  /** Default T&Cs (structured categories); editors can change them per brand. */
   tcs?: string;
   defaults?: Partial<OfferDefaults>;
   logoScale?: number;
@@ -70,6 +70,8 @@ export interface TemplateState {
   offer: string;
   brandText: Record<string, { amount?: string; offer?: string }>;
   screenByBrand: Record<string, string>;
+  /** Structured categories: editor's T&Cs per brand, replacing the brand's own. */
+  tcsByBrand: Record<string, string>;
   promoLabel: string;
   code: string;
   /** Casino / Sweepstakes free-text T&Cs. */
