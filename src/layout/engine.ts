@@ -62,11 +62,11 @@ export class LayoutEngine {
   // ---------- shared measurement helpers ----------
 
   /** Empty space above the cap height and below the baseline inside an element's line box. */
-  private inkIns(el: HTMLElement): [number, number] {
+  private inkIns(el: HTMLElement, sample = 'H'): [number, number] {
     const M = this.measureCtx || (this.measureCtx = document.createElement('canvas').getContext('2d')!);
     const c = getComputedStyle(el), f = parseFloat(c.fontSize);
     M.font = c.fontWeight + ' ' + f + 'px ' + c.fontFamily;
-    const m = M.measureText('H'), fa = m.fontBoundingBoxAscent, fd = m.fontBoundingBoxDescent;
+    const m = M.measureText(sample), fa = m.fontBoundingBoxAscent, fd = m.fontBoundingBoxDescent;
     let lh = parseFloat(c.lineHeight);
     if (!(lh > 0)) lh = fa + fd;
     const hl = (lh - fa - fd) / 2;
@@ -324,15 +324,19 @@ export class LayoutEngine {
     lz.style.transition = 'none';
     const lf = sq ? Math.min(V.lf / 0.1, 0.45 * W / Math.max(1, ...([...lz.children] as HTMLElement[]).map(e => e.offsetWidth))) : 1;
     ([...lz.children] as HTMLElement[]).forEach(e => { e.style.transition = 'transform 260ms ease'; e.style.transform = lf > 1.001 ? 'scale(' + lf + ')' : 'none'; });
-    let sp = base, h0 = 0, fine = 0.08 * H;
-    for (let i = 0; i < 3; i++) { h0 = meas(sp[1] - sp[0]); fine = cl(h0); sp = span(bot - fine, bot); }
+    // SI: fine print runs edge to edge inside the side margins.
+    const tSpan = (y0: number, y1: number): [number, number] => L.tcsFull ? [mW, W - mW] : span(y0, y1);
+    let sp = tSpan(0, 0), h0 = 0, fine = 0.08 * H;
+    for (let i = 0; i < 3; i++) { h0 = meas(sp[1] - sp[0]); fine = cl(h0); sp = tSpan(bot - fine, bot); }
     const warnF = h0 > 0.25 * H + 1;
     place(tz, sp[0], sp[1], bot - fine, bot);
     const fy0 = bot - fine;
     let cH = 0, pv: ReturnType<LayoutEngine['stylePill']> | null = null;
     if (cz) { pv = this.stylePill(key, cz, base[1] - base[0]); cH = pv.need; }
     const gc = 60 / 1080 * H;
-    const oH = Math.max(60, fy0 - top - logoH - (1 + L.logoGap) * g - (cz ? gc : 0) - cH), oy0p = top + logoH + g, oy1p = oy0p + oH;
+    // Pill to fine print: the base gap, or the site's fixed gap (export px) from the pill's visible edge.
+    const tG = cz && L.tcsGap != null ? L.tcsGap * PILL[key].s : g;
+    const oH = Math.max(60, fy0 - top - logoH - L.logoGap * g - (cz ? gc + tG : g) - cH), oy0p = top + logoH + g, oy1p = oy0p + oH;
     let osp: [number, number] = [base[0], base[1]], res: StackFit = { warn: false, h: 0 };
     const yc0 = (oy0p + oy1p) / 2, maxI = (base[1] - base[0]) * 0.3;
     const tryIns = (ins: number) => {
@@ -352,11 +356,21 @@ export class LayoutEngine {
     const lk = this.logoInk(um ? um[1] : undefined);
     const lT = le ? le.offsetTop + lk.t * le.offsetHeight : 0, lB = le ? le.offsetTop + lk.b * le.offsetHeight : logoH;
     const sv = ([...oz.querySelectorAll('[data-role="small"],[data-role="hero"],[data-role="qual"]')] as HTMLElement[]).filter(vis);
-    const oi0 = sv.length ? this.inkIns(sv[0])[0] : 0, oi1 = sv.length ? this.inkIns(sv[sv.length - 1])[1] : 0, ti = this.inkIns(te);
+    const oi0 = sv.length ? this.inkIns(sv[0])[0] : 0, oi1 = sv.length ? this.inkIns(sv[sv.length - 1])[1] : 0, ti = this.inkIns(te, L.tcsGap != null && te.textContent || 'H');
     const ring = cz && this.site.pill !== 'band' ? 0.08 * PILL[key].h * PILL[key].s : 0;
-    const uH = pv ? pv.need - 2 * ring : 0, Ch = pv ? pv.need - ring : 0, nG = cz ? 3 : 2;
+    const uH = pv ? pv.need - 2 * ring : 0;
+    let Ch = pv ? pv.need - ring : 0;
+    if (cz && L.tcsGap != null) {
+      // Measure down to the pill's own bottom edge, not the ring allowance below it.
+      place(cz, base[0], base[1], 0, cH);
+      const pill = cz.querySelector<HTMLElement>('[data-pill]');
+      let y = pill ? pill.offsetHeight : 0, el: HTMLElement | null = pill;
+      while (el && el !== cz) { y += el.offsetTop; el = el.offsetParent as HTMLElement | null; }
+      if (pill && el === cz) Ch = uH / 2 - cH / 2 + y;
+    }
+    const nG = cz ? 2 : 1;
     const G = 60 / 1080 * H, Lh = lB - lT, Oh = res.h - oi0 - oi1, Th = fine - ti[0] - ti[1];
-    const tot = Lh + Oh + Th + Ch + nG * G + (L.logoGap - 1) * G;
+    const tot = Lh + Oh + Th + Ch + nG * G + (L.logoGap - 1) * G + tG;
     const y0 = top + (bot - top - tot) / 2;
     const lt = y0 - lT;
     const ob0 = y0 + Lh + L.logoGap * G - oi0, ob1 = ob0 + res.h;
@@ -365,7 +379,7 @@ export class LayoutEngine {
       const cv0 = nb + G; cy0 = cv0 + uH / 2 - cH / 2; cy1 = cy0 + cH;
       cs = span(cy0, cy1); place(cz, cs[0], cs[1], cy0, cy1); nb = cv0 + Ch;
     }
-    const fy = nb + G - ti[0];
+    const fy = nb + tG - ti[0];
     place(lz, base[0], base[1], lt, lt + logoH); place(oz, osp[0], osp[1], ob0, ob1); place(tz, sp[0], sp[1], fy, fy + fine);
     this.flipStack(key, res, (ob0 + ob1) / 2);
 

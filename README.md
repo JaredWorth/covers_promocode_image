@@ -12,7 +12,8 @@ Built with Vite, React and TypeScript. It implements the Claude Design prototype
 
 ### SI Promo Template Builder
 
-The same tool, rebranded for Sports Illustrated, lives at `/si/` (from `project-si/SI Promo Builder.dc.html`). It has Sportsbooks and Prediction Markets only, two graphics (Square Post and Wide Banner), a sport background picker in place of the balls, a "No Logo" text mode, a white promo pill and `SIBONUS` as every brand's code. 
+The same tool, rebranded for Sports Illustrated, lives at `/si/` (from `project-si/SI Promo Builder.dc.html`). It has Sportsbooks and Prediction Markets only, two graphics (Square Post and Wide Banner), a sport background picker in place of the balls, a "No Logo" text mode, a white promo pill and `SIBONUS` as every brand's code. Its T&Cs run the full width of the graphic inside the side margins, 16px (export size) below the pill, which leaves more height for the offer. 
+
 
 ### SBR Promo Template Builder
 

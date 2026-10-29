@@ -56,6 +56,10 @@ export interface Site {
     logoGap: number;
     /** Extra scale on the fitted offer text on Banner + App Screen (SBR: 0.8). */
     appHeroScale: number;
+    /** SI: fine print spans the full width inside the side margins, not the text column. */
+    tcsFull: boolean;
+    /** SI: gap from the pill's visible bottom to the fine print ink, in export px (null: base gap). */
+    tcsGap: number | null;
   };
   theme: Record<string, string>;
 }
@@ -97,7 +101,7 @@ export const COVERS: Site = {
   textLogo: false,
   footer: { light: 'assets/covers-logo.svg', dark: 'assets/covers-logo-dark.svg', h: { t1: 54, t2: 34, t3: 0 } },
   footerName: 'Covers',
-  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: null, wideNoCodeFill: false, logoGap: 1, appHeroScale: 1 },
+  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: null, wideNoCodeFill: false, logoGap: 1, appHeroScale: 1, tcsFull: false, tcsGap: null },
   theme: COVERS_THEME,
 };
 
@@ -122,7 +126,7 @@ export const SI: Site = {
   textLogo: true,
   footer: { light: 'assets/si-logo.svg', dark: 'assets/si-logo-dark.svg', h: { t1: 106, t2: 67, t3: 0 } },
   footerName: 'SI',
-  layout: { wideX: [170, 1124], heroMaxWide: 290, subGapRatio: 0.95, subMarginRatio: null, wideNoCodeFill: true, logoGap: 1.5, appHeroScale: 1 },
+  layout: { wideX: [170, 1124], heroMaxWide: 290, subGapRatio: 0.95, subMarginRatio: null, wideNoCodeFill: true, logoGap: 1.5, appHeroScale: 1, tcsFull: true, tcsGap: 16 },
   theme: SI_THEME,
 };
 
@@ -173,7 +177,7 @@ export const SBR: Site = {
   textLogo: false,
   footer: { light: 'assets/sbr-logo.svg', dark: 'assets/sbr-logo-dark.svg', h: { t1: 54, t2: 34, t3: 0 } },
   footerName: 'SBR',
-  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: 0.08, wideNoCodeFill: false, logoGap: 1, appHeroScale: 0.8 },
+  layout: { wideX: [210, 1084], heroMaxWide: 240, subGapRatio: null, subMarginRatio: 0.08, wideNoCodeFill: false, logoGap: 1, appHeroScale: 0.8, tcsFull: false, tcsGap: null },
   theme: SBR_THEME,
 };
 
